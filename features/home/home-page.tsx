@@ -50,7 +50,7 @@ export function HomePage() {
       <section className="sell-banner">
         <div className="sell-icon"><BriefcaseBusiness size={22} /></div>
         <div><span className="eyebrow">Axtar.az-da satışa başla</span><h2>Elan yerləşdir, satışların artsın.</h2><p>Məhsulunu minlərlə alıcıya göstər.</p></div>
-        <Link href="/full-search?intent=create" className="button-primary">Yeni elan <ArrowRight size={17} /></Link>
+        <Link href="/login" className="button-primary">Yeni elan <ArrowRight size={17} /></Link>
       </section>
 
       <section className="category-section" aria-labelledby="category-title">

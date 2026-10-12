@@ -38,7 +38,7 @@ export function SiteHeader() {
             <label className="region-select"><MapPin size={16} /><select name="location" value={region} onChange={(event) => setRegion(event.target.value)} aria-label="Bölgə seçin">{regions.map((item) => <option key={item} value={item === "Bütün bölgələr" ? "" : item}>{item}</option>)}</select><ChevronDown size={15} /></label>
             <button className="search-submit" type="submit" aria-label="Axtar"><Search size={18} /></button>
           </form>
-          <Link href="/full-search?intent=create" className="new-button"><Plus size={20} /><span>Yeni</span></Link>
+          <Link href="/login" className="new-button"><Plus size={20} /><span>Yeni</span></Link>
         </div>
         {catalogOpen && <div className="catalog-panel"><div className="catalog-panel-head"><strong>Kateqoriyalar</strong><button type="button" onClick={() => setCatalogOpen(false)} aria-label="Bağla"><X size={18} /></button></div><div className="catalog-links">{categories.map((category) => <Link key={category} href={`/full-search?title=${encodeURIComponent(category)}`} onClick={() => setCatalogOpen(false)}>{category}<span>›</span></Link>)}</div></div>}
       </div>
