@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import type { ReactNode } from "react";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -7,12 +8,8 @@ const siteUrl = "https://axtar.az";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: {
-    default: "Axtar.az — Azərbaycanın elan platforması",
-    template: "%s | Axtar.az",
-  },
-  description:
-    "Axtar.az-da yeni və işlənmiş məhsullar, xidmətlər, daşınmaz əmlak və biznes elanlarını axtarın. Alış-verişinizi rahatlıqla edin.",
+  title: { default: "Axtar.az — Azərbaycanın elan platforması", template: "%s | Axtar.az" },
+  description: "Axtar.az-da yeni və işlənmiş məhsullar, xidmətlər, daşınmaz əmlak və biznes elanlarını axtarın. Alış-verişinizi rahatlıqla edin.",
   applicationName: "Axtar.az",
   alternates: { canonical: "/" },
   openGraph: {
@@ -22,21 +19,12 @@ export const metadata: Metadata = {
     title: "Axtar.az — Azərbaycanın elan platforması",
     description: "Elanlar, bizneslər və faydalı bloqlar bir ünvanda.",
     url: siteUrl,
-    images: ["/opengraph-image"],
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "Axtar.az — Azərbaycanın elan platforması",
-    description: "Elanlar, bizneslər və faydalı bloqlar bir ünvanda.",
-  },
+  twitter: { card: "summary_large_image", title: "Axtar.az — Azərbaycanın elan platforması", description: "Elanlar, bizneslər və faydalı bloqlar bir ünvanda." },
   robots: { index: true, follow: true },
 };
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  themeColor: "#ffffff",
-};
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#ffffff" };
 
 const organizationSchema = {
   "@context": "https://schema.org",
@@ -61,7 +49,7 @@ const websiteSchema = {
   },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="az">
       <body>
