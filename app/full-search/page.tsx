@@ -1,26 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SlidersHorizontal } from "lucide-react";
 import { ListingCard } from "@/features/listings/listing-card";
-import { categories, listings } from "@/features/listings/data";
-
-type SearchParams = Promise<{ title?: string; location?: string; tab?: string }>;
-
-export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
-  const params = await searchParams;
-  const term = params.title?.trim();
-  return {
-    title: term ? `${term} elanları` : "Elan axtarışı",
-    description: term ? `${term} üzrə elanları Axtar.az-da tapın.` : "Axtar.az-da minlərlə elan arasında axtarış edin.",
-    alternates: { canonical: "/full-search" },
-    robots: { index: !term, follow: true },
-  };
-}
-
-export default async function SearchPage({ searchParams }: { searchParams: SearchParams }) {
-  const params = await searchParams;
-  const query = params.title?.trim() ?? "";
-  const location = params.location?.trim() ?? "";
-  const results = listings.filter((item) => (!query || `${item.title} ${item.category}`.toLocaleLowerCase("az").includes(query.toLocaleLowerCase("az"))) && (!location || item.location === location));
-  return <div className="page-shell search-page"><nav className="breadcrumbs"><Link href="/">Ana səhifə</Link><span>›</span><span>Axtarış</span></nav><div className="search-page-head"><div><span className="eyebrow">Axtar.az elanları</span><h1>{query ? `“${query}” üzrə elanlar` : "Elanları kəşf et"}</h1><p>{results.length} elan tapıldı {location ? `· ${location}` : ""}</p></div><button className="filter-button" type="button"><SlidersHorizontal size={17} /> Filter</button></div><div className="search-layout"><aside className="filter-sidebar"><h2>Filter et</h2><div className="filter-block"><h3>Kateqoriya</h3>{categories.slice(0, 7).map((category) => <Link key={category} href={`/full-search?title=${encodeURIComponent(category)}`}>{category}<span>›</span></Link>)}</div><div className="filter-block"><h3>Elan növü</h3><label><input type="checkbox" defaultChecked /> Təklif edilir</label><label><input type="checkbox" /> Axtarılır</label><label><input type="checkbox" /> İtkin</label></div><div className="filter-block"><h3>Qiymət aralığı</h3><div className="price-range"><input aria-label="Minimum qiymət" placeholder="Min ₼" /><input aria-label="Maksimum qiymət" placeholder="Maks ₼" /></div></div><button className="button-primary filter-apply" type="button">Nəticələri göstər</button></aside><section className="search-results" aria-label="Axtarış nəticələri"><div className="results-toolbar"><span>{results.length} nəticə</span><label>Çeşidlə: <select defaultValue="recent"><option value="recent">Ən yeni</option><option value="low">Əvvəlcə ucuz</option><option value="high">Əvvəlcə bahalı</option></select></label></div>{results.length ? <div className="listing-grid">{results.map((listing) => <ListingCard key={listing.id} listing={listing} />)}</div> : <div className="empty-state"><span>⌕</span><h2>Uyğun elan tapılmadı</h2><p>Axtarış sözünü dəyişin və ya başqa kateqoriyanı seçin.</p><Link href="/full-search">Bütün elanlara bax</Link></div>}</section></div></div>;
+import { listings } from "@/features/listings/data";
+type SearchParams=Promise<{title?:string;location?:string}>;
+export async function generateMetadata({searchParams}:{searchParams:SearchParams}):Promise<Metadata>{const p=await searchParams;const term=p.title?.trim();return {title:term?`${term} elanları`:"Elanlar",description:term?`${term} üzrə elanlar Axtar.az-da`:"Axtar.az elanları",alternates:{canonical:"/full-search"},robots:{index:!term,follow:true}}}
+export default async function SearchPage({searchParams}:{searchParams:SearchParams}){
+ const p=await searchParams, term=p.title?.trim().toLocaleLowerCase("az")||"", location=p.location||"";
+ const results=listings.filter(x=>(!term||x.title.toLocaleLowerCase("az").includes(term))&&(!location||x.location===location));
+ return <div className="page-shell search-page"><div className="listing-filter-row"><button>♧ &nbsp; Filter</button><button>Çeşidlə: <b>Ən çox satılanlar</b>⌄</button><button>Kateqoriya⌄</button><button>Rəng⌄</button><button>Yaş qrupu⌄</button><button>»</button></div><div className="search-results"><h1 className="sr-only">{term? `${p.title} elanları`:"Elanlar"}</h1><div className="listing-grid">{results.map(item=><ListingCard key={item.id} listing={item}/>)}</div>{!results.length&&<p className="empty-state">Elan tapılmadı</p>}<Link className="all-listings-link" href="/">Ana səhifə</Link></div></div>
 }

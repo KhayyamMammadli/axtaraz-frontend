@@ -1,71 +1,44 @@
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, BriefcaseBusiness, MapPin, Star } from "lucide-react";
-import { categories } from "@/features/listings/data";
+import { ArrowRight, ChevronLeft, ChevronRight, MapPin, Star } from "lucide-react";
+import { listings } from "@/features/listings/data";
 import { FeedTabs } from "./feed-tabs";
+import { ListingCard } from "@/features/listings/listing-card";
 
-const businessImage = "https://storage.axtar.az/uploads/ownerships_main/min/2026/06/05/e7aac09e3bdeefa0c19f2791ddba60dd.png";
-const businesses = [
-  { name: "Design Council Scotland", count: 12, town: "Bakı" },
-  { name: "Test MMC", count: 0, town: "Bakı" },
-  { name: "DCS Studio", count: 8, town: "Bakı" },
+const ownership = "https://storage.axtar.az/uploads/ownerships_main/min/2026/06/05/e7aac09e3bdeefa0c19f2791ddba60dd.png";
+const posts = [
+  { title: "Test", href: "/post/test-3", category: "Elektronika", author: "Xeyyam", date: "16.08.2026", image: "https://storage.axtar.az/uploads/posts/min/2026/08/16/6a81c8c682955-8c473ea6eaaec3447d728283aea346a7.png", description: "test", count: "143" },
+  { title: "test blog 7", href: "/post/test-blog-7", category: "Bloq kateqoriyası", author: "Xeyyam Memmedli", date: "10.06.2026", image: "https://storage.axtar.az/uploads/posts/min/2026/06/10/6a292ee80429a-a242d5f7bd988b2edbdfeb0b1931e8dd.png", description: "SEO", count: "259" },
+  { title: "blog test 6", href: "/post/blog-test-6", category: "Bloq kateqoriyası", author: "Xeyyam Memmedli", date: "10.06.2026", image: "https://storage.axtar.az/uploads/posts/min/2026/06/10/6a29275c18122-c2d40615727189a2200b6088299fd16b.png", description: "test", count: "222" },
+  { title: "test blog 4", href: "/post/test-blog-4-2", category: "Bloq kateqoriyası", author: "Xeyyam Memmedli", date: "10.06.2026", image: "https://storage.axtar.az/uploads/posts/min/2026/06/10/6a292408be5d9-08223c701137bafa279fd0a0f39413f4.png", description: "asdsdas", count: "219" },
 ];
 
-const blogs = [
-  { title: "Ağıllı alış-veriş üçün 7 məsləhət", tag: "Alış-veriş", date: "10 iyun 2026", read: "5 dəq." },
-  { title: "Elanınızı daha çox insana necə çatdırmalı?", tag: "Satış", date: "8 iyun 2026", read: "4 dəq." },
-  { title: "Təhlükəsiz onlayn alış-veriş qaydaları", tag: "Təhlükəsizlik", date: "3 iyun 2026", read: "6 dəq." },
-];
+function BusinessCard({ name, count }: { name: string; count: string }) {
+  return <article className="business-card">
+    <Link href="/ownerships" className="business-cover"><img src={ownership} alt="" /></Link>
+    <div className="business-avatar"><img src={ownership} alt="" /></div>
+    <div className="business-toolbar"><span className="business-star"><Star size={17} fill="currentColor" /></span><Link href="/ownerships" className="outline-button">İzlə</Link></div>
+    <div className="business-body"><h2>{name}</h2><span className="business-count">{count} elan</span></div>
+  </article>;
+}
 
 export function HomePage() {
-  return (
-    <div className="page-shell">
-      <section className="business-section" aria-labelledby="premium-title">
-        <div className="section-heading">
-          <h1 id="premium-title"><span className="heading-emoji">👑</span> Premium Bizneslər</h1>
-          <Link href="/ownerships">Hamısına göstər <ArrowRight size={15} /></Link>
-        </div>
-        <div className="business-grid">
-          {businesses.map((business, index) => (
-            <article className="business-card" key={business.name}>
-              <Link href="/ownerships" className="business-cover">
-                <img src={businessImage} alt={`${business.name} cover`} />
-              </Link>
-              <div className="business-avatar"><img src={businessImage} alt="" /></div>
-              <div className="business-toolbar">
-                <span className="business-star"><Star size={17} fill="currentColor" /></span>
-                <Link href="/ownerships" className="outline-button">İzlə</Link>
-              </div>
-              <div className="business-body">
-                <h2>{business.name}</h2>
-                <span className="business-count">▦ {business.count} elan</span>
-              </div>
-              <div className="business-features"><span><MapPin size={16} /></span><span>♧</span><span>▤</span><span className={index === 1 ? "status-dot muted" : "status-dot"} /></div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <FeedTabs />
-
-      <section className="sell-banner">
-        <div className="sell-icon"><BriefcaseBusiness size={22} /></div>
-        <div><span className="eyebrow">Axtar.az-da satışa başla</span><h2>Elan yerləşdir, satışların artsın.</h2><p>Məhsulunu minlərlə alıcıya göstər.</p></div>
-        <Link href="/login" className="button-primary">Yeni elan <ArrowRight size={17} /></Link>
-      </section>
-
-      <section className="category-section" aria-labelledby="category-title">
-        <div className="section-heading"><div><span className="eyebrow">Kəşf et</span><h2 id="category-title">Kateqoriyalar</h2></div><Link href="/full-search">Bütün kateqoriyalar <ArrowRight size={15} /></Link></div>
-        <div className="category-grid">
-          {categories.map((category, index) => <Link className="category-tile" key={category} href={`/full-search?title=${encodeURIComponent(category)}`}><span className={`category-icon tone-${index % 6}`}>{["⌂", "◇", "◉", "✦", "▣", "✳"][index % 6]}</span><span>{category}</span><ArrowRight size={15} /></Link>)}
-        </div>
-      </section>
-
-      <section className="blog-section" aria-labelledby="blog-title">
-        <div className="section-heading"><div><span className="eyebrow">Bilik və ilham</span><h2 id="blog-title">Bloqlar</h2><p>Daha düzgün qərar verməyiniz üçün faydalı bloqlar</p></div><Link href="/posts">Hamısına bax <ArrowRight size={15} /></Link></div>
-        <div className="blog-grid">
-          {blogs.map((blog, index) => <article className="blog-card" key={blog.title}><Link className={`blog-art art-${index + 1}`} href="/posts"><span>{["Alıcılar üçün", "Satıcılar üçün", "Güvənli alış"][index]}</span><BadgeCheck size={26} /></Link><div className="blog-card-content"><span className="blog-tag">{blog.tag}</span><h3><Link href="/posts">{blog.title}</Link></h3><div className="blog-meta">{blog.date}<span>·</span>{blog.read}</div></div></article>)}
-        </div>
-      </section>
-    </div>
-  );
+  return <div className="page-shell">
+    <section className="business-section" aria-labelledby="premium-title">
+      <div className="section-heading"><h1 id="premium-title"><span className="heading-emoji">👑</span> Premium Bizneslər</h1><Link href="/ownerships">Hamısına göstər <ArrowRight size={15} /></Link></div>
+      <div className="business-carousel"><button aria-label="Əvvəlki bizneslər"><ChevronLeft size={16}/></button><div className="business-grid"><BusinessCard name="Test MMC" count="0"/><BusinessCard name="TEst 2" count="0"/><BusinessCard name="template 2" count="0"/></div><button aria-label="Növbəti bizneslər"><ChevronRight size={16}/></button></div>
+    </section>
+    <FeedTabs />
+    <section className="listing-grid home-listings" aria-label="Elanlar">{listings.map(item=><ListingCard key={item.id} listing={item}/>)}</section>
+    <section className="infinity-promo-banner">
+      <div className="infinity-promo-banner__content"><h2>Axtar.az'da elan yerləşdir, satışların artsın.</h2><p>NEW 100% Authentic UGG Brand Women's Tazz II Braid Platform Slippers Shoes Sand</p><Link href="/login" className="infinity-promo-banner__button"><img src="https://axtar.az/img/plus.svg" alt=""/> Yeni</Link></div>
+      <div className="infinity-promo-banner__visual"><img className="infinity-promo-banner__image" src="https://axtar.az/img/hand.svg" alt=""/></div>
+    </section>
+    <section className="blog-section" aria-labelledby="blog-title">
+      <div className="section-heading blog-heading"><div><h2 id="blog-title"><img src="https://axtar.az/img/blog-book.svg" alt=""/> Bloglar</h2><p>Daha düzgün qərar verməyiniz üçün faydalı bloglar</p></div><Link href="/posts">Hamısına bax <ArrowRight size={15}/></Link></div>
+      <div className="blog-layout">
+        <article className="blog-feature"><Link href={posts[0].href} className="blog-feature-image"><img src={posts[0].image} alt={posts[0].title}/></Link><div className="blog-feature-body"><span>{posts[0].category}</span><h3><Link href={posts[0].href}>{posts[0].title}</Link></h3><p>{posts[0].description}</p><small>{posts[0].author} · {posts[0].date}</small></div><Link className="related-listings" href="/full-search"><strong>Bu bloqda əlaqəli {posts[0].count} aktiv elan</strong><span>Mövzu ilə bağlı satışda olan elanlara baxın <ArrowRight size={15}/></span></Link></article>
+        <div className="blog-list">{posts.slice(1).map(post=><article className="blog-mini" key={post.href}><Link href={post.href} className="blog-mini-image"><img src={post.image} alt=""/></Link><div><small>{post.category}</small><h3><Link href={post.href}>{post.title}</Link></h3><p>{post.description}</p><span>{post.date} · {post.count} uyğun elan</span></div></article>)}</div>
+      </div>
+    </section>
+  </div>;
 }
