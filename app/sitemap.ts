@@ -3,11 +3,11 @@ import { listings } from "@/features/listings/data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://axtar.az";
-  const productRoutes = listings.map((listing) => {
-    const slug = listing.title.toLocaleLowerCase("az").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const id = listing.id.split("-").at(-1);
-    return { url: `${base}/product/${slug}-${id}`, changeFrequency: "daily" as const, priority: 0.7 };
-  });
+  const productRoutes = listings.map((listing) => ({
+    url: `${base}/product/${listing.slug}`,
+    changeFrequency: "daily" as const,
+    priority: 0.7,
+  }));
   return [
     { url: base, changeFrequency: "daily", priority: 1 },
     { url: `${base}/full-search`, changeFrequency: "hourly", priority: 0.9 },
