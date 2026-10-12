@@ -58,3 +58,7 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
 @media(max-width:700px){.post-hero{height:220px}.post-title-card>div{flex-wrap:wrap;gap:12px}.post-title-card>div a{margin-left:0}.post-title-card h1{font-size:24px}.post-feedback,.post-related{align-items:flex-start;gap:10px;flex-direction:column}}
 
 .home-listings{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:900px){.home-listings{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:600px){.home-listings{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Increase the shared page container width across routes */
+.page-shell,.page-shell-wide{width:min(1280px,calc(100% - 48px))}.footer-disclaimer{padding-inline:max(calc((100% - 1280px)/2),24px)}
+@media(max-width:600px){.page-shell,.page-shell-wide{width:calc(100% - 24px)}}
