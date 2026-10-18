@@ -4,17 +4,93 @@ import { PremiumBusinesses } from "./premium-businesses";
 import { getProducts } from "@/features/listings/api";
 import { FeedTabs } from "./feed-tabs";
 import { ListingCard } from "@/features/listings/listing-card";
+import {
+  formatPostDate,
+  getPostAuthor,
+  getPostImage,
+  getPosts,
+} from "@/features/posts/api";
 
-const posts=[
- {title:"Test",href:"/post/test-3",category:"Elektronika",author:"Xeyyam",date:"2026-08-16 18:28:01",image:"https://storage.axtar.az/uploads/posts/min/2026/08/16/6a81c8c682955-8c473ea6eaaec3447d728283aea346a7.png",description:"test",count:"143"},
- {title:"test blog 7",href:"/post/test-blog-7",category:"Bloq kateqoriyası",author:"Xeyyam Memmedli",date:"10.06.2026",image:"https://storage.axtar.az/uploads/posts/min/2026/06/10/6a292ee80429a-a242d5f7bd988b2edbdfeb0b1931e8dd.png",description:"SEO",count:"259"},
- {title:"blog test 6",href:"/post/blog-test-6",category:"Bloq kateqoriyası",author:"Xeyyam Memmedli",date:"10.06.2026",image:"https://storage.axtar.az/uploads/posts/min/2026/06/10/6a29275c18122-c2d40615727189a2200b6088299fd16b.png",description:"test",count:"222"},
- {title:"test blog 4",href:"/post/test-blog-4-2",category:"Bloq kateqoriyası",author:"Xeyyam Memmedli",date:"10.06.2026",image:"https://storage.axtar.az/uploads/posts/min/2026/06/10/6a292408be5d9-08223c701137bafa279fd0a0f39413f4.png",description:"asdsdas",count:"219"}
-];
+export async function HomePage() {
+  const [listings, posts] = await Promise.all([getProducts(), getPosts()]);
+  const featuredPost = posts[0];
+  const otherPosts = posts.slice(1, 4);
 
-export async function HomePage(){const listings=await getProducts();return <div className="page-shell"><h1 className="sr-only">Axtar.az — elanlar, bizneslər və xidmətlər</h1>
-<PremiumBusinesses />
-<FeedTabs/>
-<section className="listing-grid home-listings" aria-label="Elanlar">{listings.map(item=><ListingCard key={item.id} listing={item}/>)}</section>
-<section className="infinity-promo-banner"><div className="infinity-promo-banner__content"><h2>Axtar.az'da elan yerləşdir, satışların artsın.</h2><p>NEW 100% Authentic UGG Brand Women's Tazz II Braid Platform Slippers Shoes Sand</p><Link href="/product/create" className="infinity-promo-banner__button"><img src="https://axtar.az/img/plus.svg" alt=""/> Yeni</Link></div><div className="infinity-promo-banner__visual"><img className="infinity-promo-banner__image" src="https://axtar.az/img/hand.svg" alt=""/></div></section>
-<section className="blog-section"><div className="section-heading blog-heading"><div><h2><img src="https://axtar.az/img/blog-book.svg" alt=""/> Bloglar</h2><p>Daha düzgün qərar verməyiniz üçün faydalı bloglar</p></div><Link href="/posts">Hamısına bax <ArrowRight size={15}/></Link></div><div className="blog-layout"><article className="blog-feature"><Link href={posts[0].href} className="blog-feature-image"><img src={posts[0].image} alt={posts[0].title}/></Link><div className="blog-feature-body"><span>{posts[0].category}</span><h3><Link href={posts[0].href}>{posts[0].title}</Link></h3><p>{posts[0].description}</p><small>{posts[0].author} · {posts[0].date}</small></div><Link className="related-listings" href="/full-search"><strong>Bu bloqda əlaqəli {posts[0].count} aktiv elan</strong><span>Mövzu ilə bağlı satışda olan elanlara baxın <ArrowRight size={15}/></span></Link></article><div className="blog-list">{posts.slice(1).map(post=><article className="blog-mini" key={post.href}><Link href={post.href} className="blog-mini-image"><img src={post.image} alt=""/></Link><div><small>{post.category}</small><h3><Link href={post.href}>{post.title}</Link></h3><p>{post.description}</p><span>{post.date} · {post.count} uyğun elan</span></div></article>)}</div></div></section></div>}
+  return (
+    <div className="page-shell">
+      <h1 className="sr-only">Axtar.az — elanlar, bizneslər və xidmətlər</h1>
+      <PremiumBusinesses />
+      <FeedTabs />
+      <section className="listing-grid home-listings" aria-label="Elanlar">
+        {listings.map((item) => (
+          <ListingCard key={item.id} listing={item} />
+        ))}
+      </section>
+      <section className="infinity-promo-banner">
+        <div className="infinity-promo-banner__content">
+          <h2>Axtar.az&apos;da elan yerləşdir, satışların artsın.</h2>
+          <p>Elanınızı yerləşdirin və daha çox insana çatdırın.</p>
+          <Link href="/product/create" className="infinity-promo-banner__button">
+            <img src="https://axtar.az/img/plus.svg" alt="" /> Yeni
+          </Link>
+        </div>
+        <div className="infinity-promo-banner__visual">
+          <img className="infinity-promo-banner__image" src="https://axtar.az/img/hand.svg" alt="" />
+        </div>
+      </section>
+      <section className="blog-section">
+        <div className="section-heading blog-heading">
+          <div>
+            <h2><img src="https://axtar.az/img/blog-book.svg" alt="" /> Bloglar</h2>
+            <p>Daha düzgün qərar verməyiniz üçün faydalı bloglar</p>
+          </div>
+          <Link href="/posts">Hamısına bax <ArrowRight size={15} /></Link>
+        </div>
+        {featuredPost ? (
+          <div className="blog-layout">
+            <article className="blog-feature">
+              <Link href={`/post/${featuredPost.slug}`} className="blog-feature-image">
+                {getPostImage(featuredPost) && (
+                  <img src={getPostImage(featuredPost)} alt={featuredPost.title} />
+                )}
+              </Link>
+              <div className="blog-feature-body">
+                <h3><Link href={`/post/${featuredPost.slug}`}>{featuredPost.title}</Link></h3>
+                <p>{featuredPost.short_description || featuredPost.description || ""}</p>
+                <small>
+                  {[getPostAuthor(featuredPost), formatPostDate(featuredPost.created_at), `${featuredPost.view_count ?? 0} baxış`]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </small>
+              </div>
+              <Link className="related-listings" href={`/post/${featuredPost.slug}`}>
+                <strong>{featuredPost.view_count ?? 0} baxış</strong>
+                <span>Məqaləni oxumağa davam edin <ArrowRight size={15} /></span>
+              </Link>
+            </article>
+            <div className="blog-list">
+              {otherPosts.map((post) => (
+                <article className="blog-mini" key={post.id}>
+                  <Link href={`/post/${post.slug}`} className="blog-mini-image">
+                    {getPostImage(post) && <img src={getPostImage(post)} alt={post.title} />}
+                  </Link>
+                  <div>
+                    <h3><Link href={`/post/${post.slug}`}>{post.title}</Link></h3>
+                    <p>{post.short_description || post.description || ""}</p>
+                    <span>
+                      {[formatPostDate(post.created_at), `${post.view_count ?? 0} baxış`]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p>Hazırda göstəriləcək bloq yoxdur.</p>
+        )}
+      </section>
+    </div>
+  );
+}

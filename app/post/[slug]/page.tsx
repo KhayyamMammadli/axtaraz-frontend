@@ -2,15 +2,89 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, Eye, Heart, Share2 } from "lucide-react";
-const entries=[
-{slug:"blog-3",title:"Blog 3",category:"Bloq kateqoriyası",description:"3 df edfw",body:"wer w43r df ewr",author:"Tural Rzaxanov",date:"29.11.2025",views:"822",image:"https://storage.axtar.az/uploads/posts/min/2025/11/29/692afec9473b7-9665c8a3966ebda6c4d6cdf0ead98d13.jpg"},
-{slug:"blog-1",title:"blog 1",category:"Bloq kateqoriyası",description:"sd d",body:"wer 3wef",author:"Tural Rzaxanov",date:"29.11.2025",views:"772",image:"https://storage.axtar.az/uploads/posts/min/2025/11/29/692afe9a52702-259e6b080f4cf901609d3ccd468a5d18.jpg"},
-{slug:"test-3",title:"Test",category:"Elektronika",description:"test",body:"test",author:"Xeyyam",date:"16.08.2026",views:"",image:"https://storage.axtar.az/uploads/posts/min/2026/08/16/6a81c8c682955-8c473ea6eaaec3447d728283aea346a7.png"},
-{slug:"test-blog-7",title:"test blog 7",category:"Bloq kateqoriyası",description:"SEO",body:"SEO",author:"Xeyyam Memmedli",date:"10.06.2026",views:"",image:"https://storage.axtar.az/uploads/posts/min/2026/06/10/6a292ee80429a-a242d5f7bd988b2edbdfeb0b1931e8dd.png"},
-{slug:"blog-test-6",title:"blog test 6",category:"Bloq kateqoriyası",description:"test",body:"test",author:"Xeyyam Memmedli",date:"10.06.2026",views:"",image:"https://storage.axtar.az/uploads/posts/min/2026/06/10/6a29275c18122-c2d40615727189a2200b6088299fd16b.png"},
-{slug:"test-blog-4-2",title:"test blog 4",category:"Bloq kateqoriyası",description:"asdsdas",body:"asdsdas",author:"Xeyyam Memmedli",date:"10.06.2026",views:"",image:"https://storage.axtar.az/uploads/posts/min/2026/06/10/6a292408be5d9-08223c701137bafa279fd0a0f39413f4.png"}
-];
-type Props={params:Promise<{slug:string}>};
-export const revalidate = 3600;
-export async function generateMetadata({params}:Props):Promise<Metadata>{const {slug}=await params;const post=entries.find(x=>x.slug===slug);return post?{title:post.title,description:post.description,openGraph:{type:"article",images:[post.image]}}:{title:"Blog tapılmadı"}}
-export default async function PostPage({params}:Props){const {slug}=await params;const post=entries.find(x=>x.slug===slug);if(!post)notFound();const schema={"@context":"https://schema.org","@type":"BlogPosting",headline:post.title,description:post.description,image:post.image,datePublished:post.slug==="blog-3"||post.slug==="blog-1"?"2025-11-29":post.date,author:{"@type":"Person",name:post.author},mainEntityOfPage:`https://axtar.az/post/${post.slug}`};return <div className="page-shell post-detail"><script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(schema)}}/><nav className="breadcrumbs"><Link href="/">Ana səhifə</Link><span>›</span><Link href="/posts">Bloqlar</Link><span>›</span><span>{post.category}</span><span>›</span><b>{post.title}</b></nav><article><div className="post-hero"><img src={post.image} alt={post.title}/><span>{post.category}</span><div><button aria-label="Favoritə əlavə et"><Heart size={20}/></button><button aria-label="Paylaş"><Share2 size={20}/></button></div></div><header className="post-title-card"><h1>{post.title}</h1><div><span>◷ &nbsp;10 ay əvvəl</span><span><Eye size={15}/> {post.views} baxış</span><span>0</span><b>ⓑ &nbsp;{post.author} ⚙</b><Link href="/posts">Bütün elanlara bax</Link></div></header><section className="post-copy"><p>{post.description}</p><p>{post.body}</p>{post.slug==="blog-3"&&<><h2>1. Dizayn və ekran</h2><p>Bütün iPhone 15 modelləri Ceramic Shield ön şüşə və alüminium və ya titan çərçivə ilə təqdim olunur.</p><ul><li>iPhone 15 və 15 Plus: 6.1 və 6.7 düymlük Super Retina XDR ekran.</li><li>iPhone 15 Pro və 15 Pro Max: Super Retina XDR ekran və ProMotion texnologiyası.</li></ul><h2>2. Performans</h2><p>A16 Bionic çip və A17 Pro çip cihazların sürətini, qrafik imkanlarını və enerji səmərəliliyini maksimum səviyyəyə çatdırır.</p></>}</section><div className="post-feedback">Bu məqaləni faydalı hesab etdiniz? Rəyiniz bizim üçün önəmlidir. <button>♡ &nbsp;Bəyənirəm</button></div><section className="post-related"><h2>Əlaqəli elanlar</h2><Link href="/full-search">Hamısına bax <ArrowRight size={15}/></Link></section></article></div>}
+import { formatPostDate, getPostAuthor, getPostBySlug, getPostImage } from "@/features/posts/api";
+
+type Props = { params: Promise<{ slug: string }> };
+export const revalidate = 60;
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPostBySlug(slug);
+  if (!post) return { title: "Blog tapılmadı" };
+
+  const image = getPostImage(post);
+  return {
+    title: post.title,
+    description: post.short_description || post.description || undefined,
+    alternates: { canonical: `/post/${post.slug}` },
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description: post.short_description || post.description || undefined,
+      ...(image ? { images: [image] } : {}),
+      publishedTime: post.created_at,
+    },
+  };
+}
+
+export default async function PostPage({ params }: Props) {
+  const { slug } = await params;
+  const post = await getPostBySlug(slug);
+  if (!post) notFound();
+
+  const image = getPostImage(post);
+  const author = getPostAuthor(post);
+  const summary = post.short_description || post.description || "";
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: summary,
+    ...(image ? { image } : {}),
+    ...(post.created_at ? { datePublished: post.created_at } : {}),
+    ...(author ? { author: { "@type": "Person", name: author } } : {}),
+    mainEntityOfPage: `https://axtar.az/post/${post.slug}`,
+  };
+
+  return (
+    <div className="page-shell post-detail">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }}
+      />
+      <nav className="breadcrumbs">
+        <Link href="/">Ana səhifə</Link><span>›</span>
+        <Link href="/posts">Bloqlar</Link><span>›</span><b>{post.title}</b>
+      </nav>
+      <article>
+        <div className="post-hero">
+          {image && <img src={image} alt={post.title} />}
+          <div>
+            <button aria-label="Favoritə əlavə et"><Heart size={20} /></button>
+            <button aria-label="Paylaş"><Share2 size={20} /></button>
+          </div>
+        </div>
+        <header className="post-title-card">
+          <h1>{post.title}</h1>
+          <div>
+            <span>◷ &nbsp;{formatPostDate(post.created_at)}</span>
+            <span><Eye size={15} /> {post.view_count ?? 0} baxış</span>
+            {author && <b>{author}</b>}
+            <Link href="/posts">Bütün bloqlara bax</Link>
+          </div>
+        </header>
+        <section className="post-copy">
+          {post.short_description && <p>{post.short_description}</p>}
+          {post.description && <p>{post.description}</p>}
+        </section>
+        <div className="post-feedback">
+          Bu məqaləni faydalı hesab etdiniz? Rəyiniz bizim üçün önəmlidir. <button>♡ &nbsp;Bəyənirəm</button>
+        </div>
+        <section className="post-related">
+          <h2>Əlaqəli elanlar</h2>
+          <Link href="/full-search">Hamısına bax <ArrowRight size={15} /></Link>
+        </section>
+      </article>
+    </div>
+  );
+}
