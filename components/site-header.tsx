@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ChevronDown, Heart, List, MapPin, Menu, MessageCircle, Plus, Search, X } from "lucide-react";
@@ -26,8 +26,18 @@ function CatalogPanel({ close }: { close: () => void }) {
 export function SiteHeader(){
   const pathname=usePathname();
   const[query,setQuery]=useState(""),[region,setRegion]=useState("Bütün bölgələr"),[catalogOpen,setCatalogOpen]=useState(false),[mobileMenu,setMobileMenu]=useState(false),[compact,setCompact]=useState(false);
+  const compactRef=useRef(false);
   useEffect(()=>{
-    const onScroll=()=>setCompact(window.scrollY>90);
+    const onScroll=()=>{
+      const scrollY=window.scrollY;
+      if(!compactRef.current && scrollY>180){
+        compactRef.current=true;
+        setCompact(true);
+      }else if(compactRef.current && scrollY<55){
+        compactRef.current=false;
+        setCompact(false);
+      }
+    };
     onScroll();
     window.addEventListener("scroll",onScroll,{passive:true});
     return ()=>window.removeEventListener("scroll",onScroll);
