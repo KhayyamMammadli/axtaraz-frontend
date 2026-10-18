@@ -1,9 +1,33 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, LockKeyhole } from "lucide-react";
+import { LoginForm } from "@/features/auth/login-form";
+import styles from "@/features/auth/login.module.css";
 
-export const metadata: Metadata = { title: "Daxil ol", robots: { index: false, follow: false } };
+export const metadata: Metadata = {
+  title: "Daxil ol",
+  robots: { index: false, follow: false },
+};
 
 export default function LoginPage() {
-  return <section className="auth-page page-shell"><div className="auth-card"><span className="auth-icon"><LockKeyhole size={24} /></span><span className="eyebrow">Axtar.az hesabı</span><h1>Daxil ol</h1><p>Seçilmiş elanlara, mesajlara və biznes profilinizə keçid.</p><div className="auth-notice">Hesab və autentifikasiya servisi qoşulduqdan sonra bu bölmə aktiv olacaq.</div><Link href="/" className="button-primary"><ArrowLeft size={16} /> Ana səhifəyə qayıt</Link></div></section>;
+  return (
+    <section className={styles.screen} aria-label="Axtar.az hesabına daxil ol">
+      <div className={styles.layout}>
+        <div className={styles.panel}>
+          <Link href="/" className={styles.logo} aria-label="Axtar.az ana səhifə">
+            <img src="https://axtar.az/img/logo.svg" alt="axtar.az" />
+          </Link>
+          <h1>Xoş gəlmisiniz</h1>
+          <p className={styles.subtitle}>Zəhmət olmasa giriş üçün məlumatları daxil edin</p>
+          <LoginForm />
+        </div>
+        <div className={styles.illustration}>
+          <img
+            src="/images/login-ship.webp"
+            alt="Qırmızı yelkənli gəmidə dənizə baxan kapitan"
+            className={styles.ship}
+          />
+        </div>
+      </div>
+    </section>
+  );
 }
