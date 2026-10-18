@@ -42,7 +42,7 @@ export function SiteHeader(){
     window.addEventListener("scroll",onScroll,{passive:true});
     return ()=>window.removeEventListener("scroll",onScroll);
   },[]);
-  return <header className={compact?"site-header is-compact":"site-header"}>
+  return <header className={compact || pathname === "/login"?"site-header is-compact":"site-header"}>
     <div className="topbar"><div className="topbar-inner page-shell-wide">
       <Link href="/" className="brand"><img src="https://axtar.az/img/logo.svg" alt="axtar.az"/></Link>
       <button className="icon-button menu-toggle" aria-label="Menyu" onClick={()=>setMobileMenu(!mobileMenu)}>{mobileMenu?<X size={20}/>:<Menu size={20}/>}</button>
