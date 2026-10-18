@@ -166,3 +166,15 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
 .compact-brand img{position:static;width:40px;height:40px;max-width:100%;transform:none;object-fit:contain}
 @media(max-width:900px){.compact-brand{flex-basis:40px;width:40px;height:40px}.compact-brand img{width:40px;height:40px}}
 @media(max-width:700px){.compact-brand{flex-basis:34px;width:34px;height:34px}.compact-brand img{width:34px;height:34px}}
+
+/* Keep the full Axtar.az wordmark visible in the compact header. */
+.compact-brand{flex:0 0 112px;width:112px;height:40px;overflow:visible;border-radius:0}
+.compact-brand img{display:block;position:static;width:112px;height:auto;max-width:100%;transform:none;object-fit:contain}
+@media(max-width:900px){
+  .compact-brand{flex-basis:90px;width:90px;height:36px}
+  .compact-brand img{width:90px}
+}
+@media(max-width:700px){
+  .compact-brand{flex-basis:78px;width:78px;height:32px}
+  .compact-brand img{width:78px}
+}
