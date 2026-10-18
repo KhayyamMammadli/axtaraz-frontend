@@ -5,7 +5,6 @@ import { listings } from "@/features/listings/data";
 import { FeedTabs } from "./feed-tabs";
 import { ListingCard } from "@/features/listings/listing-card";
 
-const ownership="https://storage.axtar.az/uploads/ownerships_main/min/2026/06/05/e7aac09e3bdeefa0c19f2791ddba60dd.png";
 const posts=[
  {title:"Test",href:"/post/test-3",category:"Elektronika",author:"Xeyyam",date:"2026-08-16 18:28:01",image:"https://storage.axtar.az/uploads/posts/min/2026/08/16/6a81c8c682955-8c473ea6eaaec3447d728283aea346a7.png",description:"test",count:"143"},
  {title:"test blog 7",href:"/post/test-blog-7",category:"Bloq kateqoriyası",author:"Xeyyam Memmedli",date:"10.06.2026",image:"https://storage.axtar.az/uploads/posts/min/2026/06/10/6a292ee80429a-a242d5f7bd988b2edbdfeb0b1931e8dd.png",description:"SEO",count:"259"},
