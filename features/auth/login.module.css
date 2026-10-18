@@ -4,13 +4,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 34px 24px 50px;
+  padding: 34px 0 50px;
   background: #fff;
   color: #181a20;
 }
 
 .layout {
-  width: min(1664px, 100%);
+  width: min(1240px, calc(100vw - 48px));
   min-height: min(740px, calc(100svh - 140px));
   display: grid;
   grid-template-columns: minmax(320px, clamp(360px, 24vw, 490px)) minmax(0, 1fr);
@@ -241,6 +241,7 @@
 @media (max-width: 760px) {
   .screen { min-height: auto; padding: 26px 22px 30px; }
   .layout {
+    width: 100%;
     min-height: 0;
     display: flex;
     flex-direction: column;
