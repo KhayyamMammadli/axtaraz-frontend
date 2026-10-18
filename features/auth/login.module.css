@@ -11,41 +11,40 @@
 
 .layout {
   width: min(1664px, 100%);
-  min-height: min(850px, calc(100svh - 155px));
+  min-height: min(740px, calc(100svh - 140px));
   display: grid;
-  grid-template-columns: minmax(420px, 490px) minmax(0, 1fr);
+  grid-template-columns: minmax(320px, clamp(360px, 24vw, 490px)) minmax(0, 1fr);
   align-items: center;
   column-gap: clamp(70px, 8vw, 150px);
 }
 
 .panel {
   width: 100%;
-  max-width: 490px;
+  max-width: clamp(360px, 24vw, 490px);
   justify-self: start;
 }
 
 .logo {
   display: block;
-  width: 208px;
-  margin: 0 auto 42px;
+  width: clamp(140px, 10.2vw, 208px);
+  margin: 0 auto 30px;
 }
 
 .logo img { width: 100%; height: auto; }
 
 .panel h1 {
   margin: 0 0 7px;
-  font-size: 32px;
+  font-size: clamp(24px, 1.56vw, 32px);
   line-height: 1.25;
   font-weight: 650;
   letter-spacing: -0.7px;
 }
 
 .subtitle {
-  margin: 0 0 34px;
+  margin: 0 0 26px;
   color: #636b7c;
-  font-size: 19px;
+  font-size: clamp(16px, 0.93vw, 19px);
   line-height: 1.45;
-  white-space: nowrap;
 }
 
 .form { display: flex; flex-direction: column; }
@@ -54,19 +53,19 @@
   display: flex;
   flex-direction: column;
   gap: 7px;
-  margin-bottom: 42px;
-  font-size: 18px;
+  margin-bottom: 28px;
+  font-size: 16px;
   font-weight: 550;
 }
 
 .inputWrap {
-  min-height: 58px;
+  min-height: 48px;
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 0 15px;
   border: 1px solid #dfe2e8;
-  border-radius: 15px;
+  border-radius: 13px;
   color: #9aa1ae;
 }
 
@@ -78,12 +77,12 @@
 .inputWrap input {
   width: 100%;
   min-width: 0;
-  height: 54px;
+  height: 44px;
   border: 0;
   outline: 0;
   background: transparent;
   color: #20232b;
-  font-size: 19px;
+  font-size: 16px;
 }
 
 .inputWrap input::placeholder { color: #9299a7; opacity: 1; }
@@ -99,23 +98,23 @@
 }
 
 .captcha {
-  width: min(100%, 430px);
-  min-height: 78px;
+  width: min(100%, 400px);
+  min-height: 64px;
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 12px 16px;
-  margin: 0 0 42px 27px;
+  margin: 0 0 28px 18px;
   border: 1px solid #d6d6d6;
   border-radius: 3px;
   background: #fafafa;
   box-shadow: 0 1px 4px rgb(0 0 0 / 15%);
-  font-size: 17px;
+  font-size: 15px;
 }
 
 .captcha > input {
-  width: 31px;
-  height: 31px;
+  width: 27px;
+  height: 27px;
   flex: none;
   margin: 0;
   accent-color: #4285f4;
@@ -137,15 +136,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 34px;
-  font-size: 17px;
+  margin-bottom: 25px;
+  font-size: 15px;
 }
 
 .remember { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
 
 .remember input {
-  width: 23px;
-  height: 23px;
+  width: 20px;
+  height: 20px;
   margin: 0;
   accent-color: #fa3a4d;
 }
@@ -160,13 +159,13 @@
 }
 
 .submit {
-  min-height: 61px;
+  min-height: 52px;
   width: 100%;
   border: 0;
   border-radius: 34px;
   background: #fa3a4d;
   color: white;
-  font-size: 21px;
+  font-size: 18px;
   font-weight: 500;
   transition: background 160ms ease, transform 160ms ease;
 }
@@ -187,9 +186,9 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
-  margin-top: 22px;
+  margin-top: 15px;
   color: #666d7c;
-  font-size: 17px;
+  font-size: 15px;
 }
 
 .register a {
