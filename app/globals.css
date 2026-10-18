@@ -186,3 +186,21 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
   :root{--compact-header-sticky-height:63px}
   .site-header.is-compact~main .feed-tabs{top:var(--compact-header-sticky-height)}
 }
+
+
+/* Match the supplied Premium / VIP / Urgent feed navigation reference. */
+.feed-tabs{justify-content:flex-start;gap:27px}
+.feed-tab{flex:0 0 auto;height:58px;padding:0;gap:12px;font-size:18px;font-weight:550;color:#596171}
+.feed-tab svg{width:25px;height:25px;color:#ffb900;stroke-width:2.5}
+.feed-tab.active{color:#20232b;font-weight:650;border-bottom-color:transparent}
+.feed-tab.active:after{bottom:-1px;height:4px;border-radius:4px;background:var(--brand)}
+@media(max-width:900px){
+  .feed-tabs{gap:21px}
+  .feed-tab{font-size:16px;gap:9px}
+  .feed-tab svg{width:22px;height:22px}
+}
+@media(max-width:600px){
+  .feed-tabs{gap:20px}
+  .feed-tab{font-size:14px;gap:7px}
+  .feed-tab svg{width:19px;height:19px}
+}
