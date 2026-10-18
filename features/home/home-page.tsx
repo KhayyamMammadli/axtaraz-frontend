@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, ChevronLeft, ChevronRight, CircleCheck, CreditCard, MapPin, Star, Truck } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { PremiumBusinesses } from "./premium-businesses";
 import { listings } from "@/features/listings/data";
 import { FeedTabs } from "./feed-tabs";
 import { ListingCard } from "@/features/listings/listing-card";
@@ -11,9 +12,9 @@ const posts=[
  {title:"blog test 6",href:"/post/blog-test-6",category:"Bloq kateqoriyası",author:"Xeyyam Memmedli",date:"10.06.2026",image:"https://storage.axtar.az/uploads/posts/min/2026/06/10/6a29275c18122-c2d40615727189a2200b6088299fd16b.png",description:"test",count:"222"},
  {title:"test blog 4",href:"/post/test-blog-4-2",category:"Bloq kateqoriyası",author:"Xeyyam Memmedli",date:"10.06.2026",image:"https://storage.axtar.az/uploads/posts/min/2026/06/10/6a292408be5d9-08223c701137bafa279fd0a0f39413f4.png",description:"asdsdas",count:"219"}
 ];
-function BusinessCard({name,count}:{name:string,count:string}){return <article className="business-card"><Link href="/ownerships" className="business-cover"><img src={ownership} alt=""/></Link><div className="business-avatar"><img src={ownership} alt=""/></div><div className="business-toolbar"><span className="business-star"><Star size={17} fill="currentColor"/></span><Link href="/ownerships" className="outline-button">İzlə</Link></div><div className="business-body"><h2>{name}</h2><span className="business-count">{count} elan</span></div><div className="business-features"><span><MapPin size={18}/></span><span><Truck size={18}/></span><span><CreditCard size={18}/></span><span className="status-dot"><CircleCheck size={16} fill="currentColor"/></span></div></article>}
-export function HomePage(){return <div className="page-shell">
-<section className="business-section"><div className="section-heading"><h1><span className="heading-emoji">👑</span> Premium Bizneslər</h1><Link href="/ownerships">Hamısına göstər <ArrowRight size={15}/></Link></div><div className="business-carousel"><button aria-label="Əvvəlki"><ChevronLeft size={16}/></button><div className="business-grid"><BusinessCard name="template 2" count="0"/><BusinessCard name="Test MMC" count="0"/><BusinessCard name="TEst 2" count="0"/></div><button aria-label="Növbəti"><ChevronRight size={16}/></button></div></section>
+
+export function HomePage(){return <div className="page-shell"><h1 className="sr-only">Axtar.az — elanlar, bizneslər və xidmətlər</h1>
+<PremiumBusinesses />
 <FeedTabs/>
 <section className="listing-grid home-listings" aria-label="Elanlar">{listings.map(item=><ListingCard key={item.id} listing={item}/>)}</section>
 <section className="infinity-promo-banner"><div className="infinity-promo-banner__content"><h2>Axtar.az'da elan yerləşdir, satışların artsın.</h2><p>NEW 100% Authentic UGG Brand Women's Tazz II Braid Platform Slippers Shoes Sand</p><Link href="/product/create" className="infinity-promo-banner__button"><img src="https://axtar.az/img/plus.svg" alt=""/> Yeni</Link></div><div className="infinity-promo-banner__visual"><img className="infinity-promo-banner__image" src="https://axtar.az/img/hand.svg" alt=""/></div></section>
