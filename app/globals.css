@@ -116,3 +116,47 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
   .business-carousel>button:first-child{left:-7px}
   .business-carousel>button:last-child{right:-7px}
 }
+
+/* Compact sticky navigation shown after the page starts scrolling. */
+.compact-header{display:none;align-items:center;gap:14px;min-height:70px}
+.site-header,.topbar,.searchbar-wrap,.compact-header{transition:min-height .2s ease,padding .2s ease,opacity .16s ease}
+.site-header.is-compact .topbar,.site-header.is-compact .searchbar-wrap{display:none}
+.site-header.is-compact .compact-header{display:flex}
+.compact-brand{position:relative;display:block;flex:0 0 40px;width:40px;height:48px;overflow:hidden}
+.compact-brand img{position:absolute;left:0;top:50%;width:112px;max-width:none;transform:translateY(-50%)}
+.compact-catalog-wrap{position:relative;flex:none}
+.compact-catalog{display:grid;place-items:center;width:48px;height:48px;border:0;border-radius:50%;background:var(--brand);color:#fff}
+.compact-catalog.is-open{background:var(--brand-dark)}
+.compact-search{flex:1;min-width:160px;height:48px;border-radius:27px;padding-left:17px;padding-right:10px}
+.compact-search .region-select{margin-left:auto;padding-left:14px}
+.compact-search .region-select select{max-width:145px}
+.compact-create,.compact-favorite,.compact-message{position:relative;display:grid;place-items:center;flex:none;width:48px;height:48px;border:1px solid #ffd0d5;border-radius:50%;color:var(--brand);background:#fff}
+.compact-favorite,.compact-message{border-color:transparent;color:#343943}
+.favorites-badge{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 4px;display:grid;place-items:center;border-radius:10px;background:var(--brand);color:#fff;font-size:10px;font-weight:700;border:2px solid #fff}
+.compact-login{flex:none;padding:11px 21px;border-radius:24px;background:var(--brand);color:#fff;font-weight:650}
+.compact-header .catalog-panel{left:0;right:auto;width:min(900px,calc(100vw - 48px))}
+.site-header.is-compact~main .feed-tabs{top:78px}
+@media(max-width:900px){
+  .compact-header{gap:8px}
+  .compact-brand{flex-basis:34px;width:34px}
+  .compact-brand img{width:100px}
+  .compact-catalog,.compact-create,.compact-favorite,.compact-message{width:42px;height:42px}
+  .compact-search{height:44px;padding-left:13px;gap:8px}
+  .compact-search .region-select{padding-left:9px;gap:4px}
+  .compact-search .region-select select{max-width:112px;font-size:12px}
+  .compact-login{padding:10px 15px}
+}
+@media(max-width:700px){
+  .compact-header{min-height:62px;gap:6px}
+  .compact-brand{flex-basis:29px;width:29px;height:42px}
+  .compact-brand img{width:88px}
+  .compact-catalog,.compact-create{width:38px;height:38px}
+  .compact-search{height:40px;min-width:0;padding:0 9px}
+  .compact-search>svg:first-child{display:none}
+  .compact-search .region-select{display:none}
+  .compact-search input{font-size:12px}
+  .compact-favorite,.compact-message{width:34px;height:38px}
+  .compact-message{display:none}
+  .compact-login{padding:9px 11px;font-size:12px}
+  .site-header.is-compact~main .feed-tabs{top:68px}
+}
