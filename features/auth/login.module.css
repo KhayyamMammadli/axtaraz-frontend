@@ -43,8 +43,9 @@
 .subtitle {
   margin: 0 0 26px;
   color: #636b7c;
-  font-size: clamp(16px, 0.93vw, 19px);
+  font-size: clamp(13px, 0.93vw, 19px);
   line-height: 1.45;
+  white-space: nowrap;
 }
 
 .form { display: flex; flex-direction: column; }
@@ -98,7 +99,7 @@
 }
 
 .captcha {
-  width: min(100%, 400px);
+  width: min(calc(100% - 36px), 430px);
   min-height: 72px;
   display: flex;
   align-items: center;
