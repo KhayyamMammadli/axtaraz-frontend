@@ -204,3 +204,13 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
   .feed-tab{font-size:14px;gap:7px}
   .feed-tab svg{width:19px;height:19px}
 }
+
+
+/* Soften premium section typography to a medium weight. */
+.business-section>.section-heading h2,
+.business-section>.section-heading>a,
+.business-body h3,
+.business-count,
+.business-toolbar .outline-button,
+.feed-tab,
+.feed-tab.active{font-weight:500}
