@@ -105,3 +105,14 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
 /* Match the reference's simple online status indicator. */
 .business-online svg{display:none}
 .business-online::after{content:"";display:block;width:14px;height:14px;border-radius:50%;background:#20c968}
+
+/* Keep the premium cards flush with the shared container edges. */
+.business-carousel{display:block;position:relative}
+.business-carousel>.business-grid{width:100%;margin:0}
+.business-carousel>button{position:absolute;top:50%;z-index:5;transform:translateY(-50%)}
+.business-carousel>button:first-child{left:-12px}
+.business-carousel>button:last-child{right:-12px}
+@media(max-width:600px){
+  .business-carousel>button:first-child{left:-7px}
+  .business-carousel>button:last-child{right:-7px}
+}
