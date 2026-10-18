@@ -101,3 +101,7 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
   .business-cover{border-radius:15px 15px 0 0}
   .business-toolbar .outline-button{min-width:clamp(90px,29cqw,120px)}
 }
+
+/* Match the reference's simple online status indicator. */
+.business-online svg{display:none}
+.business-online::after{content:"";display:block;width:14px;height:14px;border-radius:50%;background:#20c968}
