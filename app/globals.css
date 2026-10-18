@@ -62,3 +62,42 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
 /* Increase the shared page container width across routes */
 .page-shell,.page-shell-wide{width:min(1240px,calc(100% - 48px))}.footer-disclaimer{padding-inline:max(calc((100% - 1240px)/2),24px)}
 @media(max-width:600px){.page-shell,.page-shell-wide{width:calc(100% - 24px)}}
+
+/* Premium business cards follow the supplied Axtar.az reference. */
+.business-section{padding-top:28px}
+.business-section>.section-heading{margin:0 6px 26px}
+.business-section>.section-heading h2{font-size:clamp(25px,2.2vw,32px);font-weight:750;letter-spacing:-.6px}
+.business-section>.section-heading>a{font-size:18px;font-weight:650;gap:10px}
+.business-carousel{grid-template-columns:32px minmax(0,1fr) 32px;gap:10px}
+.business-carousel>button{display:grid;place-items:center;width:32px;height:32px;border:1px solid #eceef1;border-radius:50%;background:#fff;color:#9096a1;transition:background .18s,color .18s,border-color .18s}
+.business-carousel>button:hover{background:#fff4f5;border-color:#ffd0d5;color:var(--brand)}
+.business-grid{display:flex;min-width:0;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.business-grid::-webkit-scrollbar{display:none}
+.business-grid>.business-card{container-type:inline-size;position:relative;flex:0 0 calc((100% - 48px)/4);min-width:0;border:1px solid #e8eaee;border-radius:22px;box-shadow:0 4px 14px rgba(24,31,45,.055);scroll-snap-align:start}
+.business-cover{height:auto;aspect-ratio:2.1/1;border-radius:21px 21px 0 0}
+.business-cover img{opacity:1;object-fit:cover}
+.business-avatar{top:clamp(90px,32.1cqw,142px);left:8.5cqw;width:clamp(86px,31cqw,136px);height:clamp(86px,31cqw,136px);padding:7px;border:1px solid #edf0f3;box-shadow:0 10px 22px rgba(20,25,35,.14);z-index:2}
+.business-toolbar{top:calc(clamp(132px,47.62cqw,210px) + 14px);right:5.5cqw;gap:4cqw}
+.business-star{width:clamp(42px,12cqw,54px);height:clamp(42px,12cqw,54px);border-radius:13px;color:#fff}
+.business-star svg{width:clamp(20px,5.2cqw,25px);height:clamp(20px,5.2cqw,25px)}
+.business-toolbar .outline-button{height:clamp(44px,12cqw,54px);min-width:clamp(92px,29cqw,130px);padding-inline:10px;border:2px solid #ff3653;border-radius:12px;background:#fff;font-size:clamp(14px,4cqw,18px);font-weight:700}
+.business-body{padding:clamp(64px,24cqw,106px) 3.3cqw 24px}
+.business-body h3{font-size:clamp(21px,6.8cqw,30px);line-height:1.18;margin:0 0 16px;font-weight:800;letter-spacing:-.5px}
+.business-count{display:inline-flex;align-items:center;gap:10px;padding:9px 13px;border-radius:11px;background:#f4f5f8;color:#687387;font-size:clamp(14px,4.1cqw,18px);font-weight:700}
+.business-count svg{flex:none}
+.business-features{display:grid;grid-template-columns:repeat(4,1fr);align-items:center;height:68px;margin:0 3.3cqw;padding:0;border-top:1px solid #e9ebef;color:#748097}
+.business-features>span{display:grid;place-items:center;height:29px}
+.business-features>span+span{border-left:1px solid #e9ebef}
+.business-online{width:32px;height:32px!important;border:0!important;border-radius:50%;background:#e5f8ec;color:#20c968}
+@media(max-width:900px){.business-grid>.business-card{flex-basis:calc((100% - 16px)/2)}}
+@media(max-width:600px){
+  .business-section{padding-top:22px}
+  .business-section>.section-heading{margin:0 0 16px}
+  .business-section>.section-heading h2{font-size:22px}
+  .business-section>.section-heading>a{font-size:13px}
+  .business-carousel{grid-template-columns:24px minmax(0,1fr) 24px;gap:5px}
+  .business-carousel>button{width:24px;height:28px;border:0}
+  .business-grid>.business-card{flex-basis:100%;border-radius:16px}
+  .business-cover{border-radius:15px 15px 0 0}
+  .business-toolbar .outline-button{min-width:clamp(90px,29cqw,120px)}
+}
