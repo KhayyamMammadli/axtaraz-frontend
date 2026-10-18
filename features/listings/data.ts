@@ -6,6 +6,7 @@ export type Listing = {
   location: string;
   age: string;
   image: string;
+  level?: string;
 };
 
 export const listings: Listing[] = [
