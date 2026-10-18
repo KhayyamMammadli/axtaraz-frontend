@@ -49,7 +49,7 @@ export function SiteHeader(){
       <Link href="/product/create" className="new-button"><Plus size={20}/>Yeni</Link>
     </div>{catalogOpen&&<CatalogPanel close={()=>setCatalogOpen(false)}/>}</div>
     <div className="compact-header page-shell-wide">
-      <Link href="/" className="compact-brand" aria-label="axtar.az"><img src="https://axtar.az/img/logo.svg" alt=""/></Link>
+      <Link href="/" className="compact-brand" aria-label="axtar.az"><img src="/icon.svg" alt=""/></Link>
       <div className="compact-catalog-wrap">
         <button className={catalogOpen?"compact-catalog is-open":"compact-catalog"} onClick={()=>setCatalogOpen(!catalogOpen)} aria-label="Kataloq"><List size={22}/></button>
         {catalogOpen&&<CatalogPanel close={()=>setCatalogOpen(false)}/>}
