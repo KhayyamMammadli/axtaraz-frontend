@@ -160,3 +160,9 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
   .compact-login{padding:9px 11px;font-size:12px}
   .site-header.is-compact~main .feed-tabs{top:68px}
 }
+
+/* The compact header uses the site's square brand mark. */
+.compact-brand{flex-basis:40px;width:40px;height:40px;overflow:hidden;border-radius:12px}
+.compact-brand img{position:static;width:40px;height:40px;max-width:100%;transform:none;object-fit:contain}
+@media(max-width:900px){.compact-brand{flex-basis:40px;width:40px;height:40px}.compact-brand img{width:40px;height:40px}}
+@media(max-width:700px){.compact-brand{flex-basis:34px;width:34px;height:34px}.compact-brand img{width:34px;height:34px}}
