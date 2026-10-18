@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PremiumBusinesses } from "./premium-businesses";
-import { listings } from "@/features/listings/data";
+import { getProducts } from "@/features/listings/api";
 import { FeedTabs } from "./feed-tabs";
 import { ListingCard } from "@/features/listings/listing-card";
 
@@ -12,7 +12,7 @@ const posts=[
  {title:"test blog 4",href:"/post/test-blog-4-2",category:"Bloq kateqoriyası",author:"Xeyyam Memmedli",date:"10.06.2026",image:"https://storage.axtar.az/uploads/posts/min/2026/06/10/6a292408be5d9-08223c701137bafa279fd0a0f39413f4.png",description:"asdsdas",count:"219"}
 ];
 
-export function HomePage(){return <div className="page-shell"><h1 className="sr-only">Axtar.az — elanlar, bizneslər və xidmətlər</h1>
+export async function HomePage(){const listings=await getProducts();return <div className="page-shell"><h1 className="sr-only">Axtar.az — elanlar, bizneslər və xidmətlər</h1>
 <PremiumBusinesses />
 <FeedTabs/>
 <section className="listing-grid home-listings" aria-label="Elanlar">{listings.map(item=><ListingCard key={item.id} listing={item}/>)}</section>
