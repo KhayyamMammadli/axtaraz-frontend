@@ -15,7 +15,7 @@ const options: Record<string, string[]> = {
 };
 const colors = ["#929292","#1717f5","#f1f2f3","#111111","#07820b","#f3f0d7","#ffeb00","#ff9800","#ffb5c4","#f20c0c","#b9362e","#8d13aa","#8ca4d5","#128c8c"];
 
-export function SearchFilters() {
+export function ListingFilterBar({ resultCount = 0 }: { resultCount?: number }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const [values, setValues] = useState<Record<string, string>>({sort:"Ən çox satılanlar"});
