@@ -242,7 +242,7 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
 
 /* Shared footer layout */
 .site-footer{margin-top:44px;padding:0;background:#fff;border-top:1px solid #e6e7e9}
-.footer-inner{width:min(1860px,calc(100% - 60px));max-width:none;margin:0 auto;display:grid;grid-template-columns:235px minmax(0,1fr) 235px;gap:24px;padding:28px 0 30px}
+.footer-inner.page-shell-wide{width:min(1240px,calc(100% - 48px));max-width:1240px;margin-inline:auto;display:grid;grid-template-columns:235px minmax(0,1fr) 235px;gap:24px;padding:28px 0 30px}
 .footer-brand-col{grid-column:auto;display:flex;align-items:flex-start;gap:0;padding-right:24px;border-right:1px solid #e3e4e7}
 .footer-brand-col .footer-brand img{width:160px;height:auto}
 .footer-brand-col>p{max-width:205px;margin:14px 0 23px;color:#1e2026;font-size:15px;line-height:1.85}
@@ -271,15 +271,16 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
 .store-badges small{font-size:7px;line-height:1.15}
 .store-badges b{font-size:12px;line-height:1.25}
 .store-badges i{font-style:normal}
-.footer-disclaimer{width:min(1860px,calc(100% - 60px));margin:23px auto 0;padding:24px 28px;display:flex;align-items:center;justify-content:center;gap:20px;border-radius:12px;background:#fff1f2;color:#f32240;font-size:14px}
+.footer-disclaimer.page-shell-wide{width:min(1240px,calc(100% - 48px));max-width:1240px;margin:23px auto 0;padding:24px 28px;display:flex;align-items:center;justify-content:center;gap:20px;border-radius:12px;background:#fff1f2;color:#f32240;font-size:14px}
 .footer-disclaimer>svg{flex:none;stroke:#fff;stroke-width:2.5}
 .footer-disclaimer>div{display:flex;flex-direction:column;gap:3px;color:#171a22}
 .footer-disclaimer strong{font-size:15px;font-weight:700}
 .footer-disclaimer span{font-size:14px}
-.footer-bottom{width:100%;max-width:none;margin:42px 0 0;padding:18px max(calc((100% - 1860px)/2),30px);display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid #e7e8ea;color:#171a22;font-size:14px}
+.footer-bottom.page-shell-wide{width:min(1240px,calc(100% - 48px));max-width:1240px;margin:42px auto 0;padding:18px 0;display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid #e7e8ea;color:#171a22;font-size:14px}
 .footer-bottom img{width:auto;max-width:310px;max-height:36px;object-fit:contain}
 @media(max-width:900px){
-  .footer-inner{width:calc(100% - 40px);grid-template-columns:minmax(190px,.8fr) minmax(0,2fr);gap:22px;padding:26px 0}
+  .footer-inner.page-shell-wide,.footer-disclaimer.page-shell-wide,.footer-bottom.page-shell-wide{width:min(calc(100% - 32px),720px);max-width:720px}
+  .footer-inner{width:min(calc(100% - 32px),720px);grid-template-columns:minmax(190px,.8fr) minmax(0,2fr);gap:22px;padding:26px 0}
   .footer-brand-col{grid-column:auto}
   .footer-category-col{grid-column:auto;padding-right:0;border-right:0}
   .footer-categories{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
@@ -287,12 +288,13 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
   .footer-apps{grid-column:1/-1;display:grid;grid-template-columns:1fr 1.5fr;align-items:center;gap:10px 18px}
   .footer-apps h2{margin:0}
   .footer-apps h2:nth-of-type(2){margin:0}
-  .footer-disclaimer{width:calc(100% - 40px);padding:20px}
+  .footer-disclaimer{width:min(calc(100% - 32px),720px);padding:20px}
   .footer-bottom{padding-inline:20px}
 }
 @media(max-width:600px){
   .site-footer{margin-top:28px}
-  .footer-inner{width:calc(100% - 32px);grid-template-columns:1fr;gap:22px;padding:22px 0}
+  .footer-inner.page-shell-wide,.footer-disclaimer.page-shell-wide,.footer-bottom.page-shell-wide{width:calc(100% - 24px);max-width:none}
+  .footer-inner{width:calc(100% - 24px);grid-template-columns:1fr;gap:22px;padding:22px 0}
   .footer-brand-col{padding:0 0 18px;border-right:0;border-bottom:1px solid #e3e4e7}
   .footer-brand-col .footer-brand img{width:145px}
   .footer-brand-col>p{margin:10px 0 14px;font-size:14px}
@@ -311,7 +313,7 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
   .footer-socials a{width:38px;height:38px}
   .footer-socials img{width:30px;height:30px}
   .store-badges{flex-wrap:wrap}
-  .footer-disclaimer{width:calc(100% - 32px);margin-top:8px;padding:15px;align-items:flex-start;justify-content:flex-start;gap:12px}
+  .footer-disclaimer{width:calc(100% - 24px);margin-top:8px;padding:15px;align-items:flex-start;justify-content:flex-start;gap:12px}
   .footer-disclaimer>svg{width:23px;height:23px}
   .footer-disclaimer strong{font-size:13px}
   .footer-disclaimer span{font-size:12px;line-height:1.5}
