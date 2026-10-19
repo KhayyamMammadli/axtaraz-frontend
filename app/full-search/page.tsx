@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ListingCard } from "@/features/listings/listing-card";
-import { LocationFilter } from "@/features/listings/location-filter";
 import { listings } from "@/features/listings/data";
+import { SearchFilters } from "@/features/listings/search-filters";
 
 type SearchParams = Promise<{ title?: string; location?: string; metro?: string }>;
 
@@ -27,15 +27,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
   );
 
   return (
-    <div className="page-shell search-page">
-      <div className="listing-filter-row">
-        <LocationFilter title={params.title || ""} location={location} metro={params.metro || ""} />
-        <button type="button">Çeşidlə: <b>Ən çox satılanlar</b>⌄</button>
-        <button type="button">Kateqoriya⌄</button>
-        <button type="button">Rəng⌄</button>
-        <button type="button">Yaş qrupu⌄</button>
-        <button type="button">»</button>
-      </div>
+    <div className="page-shell-wide search-page">
+      <SearchFilters />
       <div className="search-results">
         <h1 className="sr-only">{term ? `${params.title} elanları` : "Elanlar"}</h1>
         <div className="listing-grid">{results.map((item) => <ListingCard key={item.id} listing={item} />)}</div>
