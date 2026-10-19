@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { ChevronDown, Heart, List, MapPin, Menu, MessageCircle, Plus, Search, UserRound, X } from "lucide-react";
+import { ChevronDown, Heart, List, MapPin, Menu, MessageCircle, Plus, Search, X } from "lucide-react";
 const regions=["Bütün bölgələr","Bakı","Sumqayıt","Gəncə","Mingəçevir","Lənkəran","Şəki","Quba"];
 const categories=["Hazır bizneslər","Heyvanlar","Uşaqlar üçün","İtmiş əşyalar","Geyimlər, Kişi, Qadın, Uşaq","İdman və əyləncə","Zoo məhsullar","Təmir və tikinti","Məişət texnikası","Ev və bağ üçün","Komputerlər","Qida məhsulları","Restoranlar Kafelər","Qızıl zinət əşyaları","Tibbi məhsullar","Şəxsi əşyalar","Avadanlıqlar","Bazarlıq","Telefonlar","Xidmətlər","Daşınmaz əmlak","Elektronika"];
 
@@ -28,7 +28,6 @@ export function SiteHeader(){
   const[query,setQuery]=useState(""),[region,setRegion]=useState("Bütün bölgələr"),[catalogOpen,setCatalogOpen]=useState(false),[mobileMenu,setMobileMenu]=useState(false),[compact,setCompact]=useState(false);
   const compactRef=useRef(false);
   const isAuthRoute = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password";
-  const isMessagesRoute = pathname.startsWith("/messages");
   useEffect(()=>{
     const onScroll=()=>{
       const scrollY=window.scrollY;
@@ -44,7 +43,7 @@ export function SiteHeader(){
     window.addEventListener("scroll",onScroll,{passive:true});
     return ()=>window.removeEventListener("scroll",onScroll);
   },[]);
-  return <header className={isMessagesRoute ? "site-header messages-header" : compact || isAuthRoute ? "site-header is-compact" : "site-header"}>
+  return <header className={compact || isAuthRoute ? "site-header is-compact" : "site-header"}>
     <div className="topbar"><div className="topbar-inner page-shell-wide">
       <Link href="/" className="brand"><img src="https://axtar.az/img/logo.svg" alt="axtar.az"/></Link>
       <button className="icon-button menu-toggle" aria-label="Menyu" onClick={()=>setMobileMenu(!mobileMenu)}>{mobileMenu?<X size={20}/>:<Menu size={20}/>}</button>
@@ -53,7 +52,7 @@ export function SiteHeader(){
         <Link className={pathname.startsWith("/ownership")?"active":""} href="/ownerships">Bizneslər</Link>
         <Link className={pathname.startsWith("/post")?"active":""} href="/posts">Bloqlar</Link>
       </nav>
-      <div className="account-actions">{isMessagesRoute ? <><Link className="icon-button message-header-icon" href="/favorites" aria-label="Seçilmişlər"><Heart size={26}/><span>1</span></Link><Link className="icon-button message-header-icon" href="/messages" aria-label="Mesajlar"><MessageCircle size={26}/><span>1</span></Link><Link className="message-profile" href="/login" aria-label="Hesab"><UserRound size={30}/><ChevronDown size={19}/></Link></> : <><Link className="icon-button" href="/favorites" aria-label="Seçilmişlər"><Heart size={21}/></Link><Link className="icon-button" href="/messages" aria-label="Mesajlar"><MessageCircle size={20}/></Link><Link className="login-button" href="/login">Daxil ol</Link></>}</div>
+      <div className="account-actions"><><Link className="icon-button" href="/favorites" aria-label="Seçilmişlər"><Heart size={21}/></Link><Link className="icon-button" href="/messages" aria-label="Mesajlar"><MessageCircle size={20}/></Link><Link className="login-button" href="/login">Daxil ol</Link></></div>
     </div></div>
     <div className="searchbar-wrap page-shell-wide"><div className="searchbar">
       <button className={catalogOpen?"catalog-button is-open":"catalog-button"} onClick={()=>setCatalogOpen(!catalogOpen)}><span className="catalog-glyph">☷</span>Kataloq</button>
