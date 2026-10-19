@@ -27,7 +27,8 @@ export function SiteHeader(){
   const pathname=usePathname();
   const[query,setQuery]=useState(""),[region,setRegion]=useState("Bütün bölgələr"),[catalogOpen,setCatalogOpen]=useState(false),[mobileMenu,setMobileMenu]=useState(false),[compact,setCompact]=useState(false);
   const compactRef=useRef(false);
-  const isAuthRoute = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password";\n  const isMessagesRoute = pathname.startsWith("/messages");
+  const isAuthRoute = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password";
+  const isMessagesRoute = pathname.startsWith("/messages");
   useEffect(()=>{
     const onScroll=()=>{
       const scrollY=window.scrollY;
