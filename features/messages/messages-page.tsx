@@ -86,7 +86,7 @@ export function MessagesPage() {
   const [conversations, setConversations] = useState(conversationsSeed);
   const [activeTab, setActiveTab] = useState<Tab>("all");
   const [search, setSearch] = useState("");
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(1);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState(defaultFilters);
   const [draftFilters, setDraftFilters] = useState(defaultFilters);
