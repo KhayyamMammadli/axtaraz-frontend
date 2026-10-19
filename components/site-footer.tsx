@@ -1,4 +1,86 @@
 import Link from "next/link";
 import { MapPin, Mail, Phone, Tag, Search, CircleAlert } from "lucide-react";
-const columns=[["Hazır bizneslər","Heyvanlar","Uşaqlar üçün","İtmiş əşyalar","Geyimlər","Kişi","Qadın","Uşaq","İdman və əyləncə"],["Zoo məhsullar","Təmir və tikinti","Məişət texnikası","Ev və bağ üçün","Komputerlər","Qida məhsulları"],["Restoranlar Kafelər","Qızıl zinət əşyaları","Tibbi məhsullar","Şəxsi əşyalar","Avadanlıqlar","Bazarlıq"],["Telefonlar","Xidmətlər","Daşınmaz əmlak","Elektronika"]];
-export function SiteFooter(){return <footer className="site-footer"><div className="footer-inner page-shell-wide"><div className="footer-brand-col"><Link href="/" className="brand"><img src="https://axtar.az/img/logo.svg" alt="axtar.az"/></Link><p>Azərbaycanın ən yeni, ən sərfəli və ən yenilikçi elan platforması.</p><a href="mailto:support@axtar.az"><Mail size={15}/> support@axtar.az</a><a href="tel:+9945554444"><Phone size={15}/> +9945554444a</a><span><MapPin size={15}/> Baku city</span></div><div className="footer-category-col"><div className="footer-type-tabs"><span className="active"><Tag size={17}/> Təklif edilir</span><span><Search size={18}/> Axtarılır</span><span><CircleAlert size={17}/> İtkin</span></div><div className="footer-categories">{columns.map((col,i)=><div key={i}>{col.map(x=><Link key={x} href={`/full-search?title=${encodeURIComponent(x)}`}>{x} <b>›</b></Link>)}</div>)}</div></div><div className="footer-apps"><h2>Sosial şəbəkələr</h2><div className="footer-socials">{["Facebook","Instagram","Linkedin","WhatsApp"].map(x=><a key={x} href="/" aria-label={x}><img src={`https://axtar.az/img/${x}.svg`} alt={x}/></a>)}</div><h2>Mobil tətbiq</h2><div className="store-badges"><span><small>Download on the</small><b> App Store</b></span><span><small>GET IT ON</small><b>▶ Google Play</b></span></div></div></div><div className="footer-disclaimer">Axtar.az elanların məzmununa görə məsuliyyət daşımır. Satıcı ilə alıcı arasında baş verən razılaşmalara görə sayt məsuliyyət daşımır.</div><div className="footer-bottom page-shell-wide"><span>© Müəllif hüquqları qorunur 2026</span><img src="https://axtar.az/img/payment-item.svg" alt="Ödəniş üsulları"/></div></footer>}
+
+const columns = [
+  ["Hazır bizneslər", "Heyvanlar", "Uşaqlar üçün", "İtmiş əşyalar", "Geyimlər, Kişi, Qadın, Uşaq", "İdman və əyləncə"],
+  ["Zoo məhsullar", "Təmir və tikinti", "Məişət texnikası", "Ev və bağ üçün", "Komputerlər", "Qida məhsulları"],
+  ["Restoranlar Kafelər", "Qızıl zinət əşyaları", "Tibbi məhsullar", "Şəxsi əşyalar", "Avadanlıqlar", "Bazarlıq"],
+  ["Telefonlar", "Xidmətlər", "Daşınmaz əmlak", "Elektronika"],
+];
+
+const socialNetworks = ["Facebook", "Instagram", "Linkedin", "WhatsApp"];
+
+export function SiteFooter() {
+  return (
+    <footer className="site-footer">
+      <div className="footer-inner">
+        <div className="footer-brand-col">
+          <Link href="/" className="brand footer-brand">
+            <img src="https://axtar.az/img/logo.svg" alt="axtar.az" />
+          </Link>
+          <p>Azərbaycanın ən yeni, ən sərfəli və ən yenilikçi elan platforması.</p>
+          <div className="footer-contact">
+            <span className="footer-contact-icon"><Mail size={19} /></span>
+            <span><small>Email:</small><a href="mailto:support@axtar.az">support@axtar.az</a></span>
+          </div>
+          <div className="footer-contact">
+            <span className="footer-contact-icon"><Phone size={19} /></span>
+            <span><small>Nömrə:</small><a href="tel:+9945554444">+9945554444</a></span>
+          </div>
+          <div className="footer-contact">
+            <span className="footer-contact-icon"><MapPin size={19} /></span>
+            <span><small>Ünvan:</small><b>Baku city</b></span>
+          </div>
+        </div>
+
+        <div className="footer-category-col">
+          <div className="footer-type-tabs">
+            <span className="active"><Tag size={20} /> Təklif edilir</span>
+            <span><Search size={21} /> Axtarılır</span>
+            <span><CircleAlert size={20} /> İtkin</span>
+          </div>
+          <div className="footer-categories">
+            {columns.map((column, index) => (
+              <div key={index}>
+                {column.map((category) => (
+                  <Link key={category} href={`/full-search?title=${encodeURIComponent(category)}`}>
+                    {category}<b aria-hidden="true">›</b>
+                  </Link>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="footer-apps">
+          <h2>Sosial şəbəkələr</h2>
+          <div className="footer-socials">
+            {socialNetworks.map((network) => (
+              <a key={network} href="/" aria-label={network}>
+                <img src={`https://axtar.az/img/${network}.svg`} alt={network} />
+              </a>
+            ))}
+          </div>
+          <h2>Mobil tətbiq</h2>
+          <div className="store-badges">
+            <span><small>Download on the</small><b><i aria-hidden="true"></i> App Store</b></span>
+            <span><small>GET IT ON</small><b><i aria-hidden="true">▶</i> Google Play</b></span>
+          </div>
+        </div>
+      </div>
+
+      <div className="footer-disclaimer">
+        <CircleAlert size={27} fill="currentColor" aria-hidden="true" />
+        <div>
+          <strong>Axtar.az elanların məzmununa görə məsuliyyət daşımır.</strong>
+          <span>Satıcı ilə alıcı arasında baş verən razılaşmalara görə sayt məsuliyyət daşımır.</span>
+        </div>
+      </div>
+
+      <div className="footer-bottom">
+        <span>© Müəllif hüquqları qorunur 2026</span>
+        <img src="https://axtar.az/img/payment-item.svg" alt="Ödəniş üsulları" />
+      </div>
+    </footer>
+  );
+}
