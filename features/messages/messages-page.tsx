@@ -110,7 +110,7 @@ export function MessagesPage() {
           item.preview.toLocaleLowerCase("az").includes(normalizedSearch);
         return tabMatches && typeMatches && statusMatches && searchMatches;
       })
-      .sort((a, b) => filters.sort === "newest" ? b.id - a.id : a.id - b.id);
+      .sort((a, b) => filters.sort === "newest" ? a.id - b.id : b.id - a.id);
   }, [activeTab, conversations, filters, search]);
 
   const selectedConversation = conversations.find((item) => item.id === selectedId) ?? null;
@@ -161,7 +161,7 @@ export function MessagesPage() {
           <div className={styles.tabs} role="tablist" aria-label="Söhbət filtrləri">
             <button className={activeTab === "all" ? styles.activeTab : ""} onClick={() => setActiveTab("all")} role="tab" aria-selected={activeTab === "all"}>Hamısı</button>
             <button className={activeTab === "mine" ? styles.activeTab : ""} onClick={() => setActiveTab("mine")} role="tab" aria-selected={activeTab === "mine"}>Mənimkilər</button>
-            <button className={activeTab === "interested" ? styles.activeTab : ""} onClick={() => setActiveTab("interested")} role="tab" aria-selected={activeTab === "interested"}>Maraqlındıqlarım</button>
+            <button className={activeTab === "interested" ? styles.activeTab : ""} onClick={() => setActiveTab("interested")} role="tab" aria-selected={activeTab === "interested"}>Maraqlandıqlarım</button>
           </div>
           <div className={styles.searchRow}>
             <label className={styles.searchBox}>
