@@ -27,6 +27,7 @@ export function SiteHeader(){
   const pathname=usePathname();
   const[query,setQuery]=useState(""),[region,setRegion]=useState("Bütün bölgələr"),[catalogOpen,setCatalogOpen]=useState(false),[mobileMenu,setMobileMenu]=useState(false),[compact,setCompact]=useState(false);
   const compactRef=useRef(false);
+  const isAuthRoute = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password";
   useEffect(()=>{
     const onScroll=()=>{
       const scrollY=window.scrollY;
@@ -42,7 +43,7 @@ export function SiteHeader(){
     window.addEventListener("scroll",onScroll,{passive:true});
     return ()=>window.removeEventListener("scroll",onScroll);
   },[]);
-  return <header className={compact || pathname === "/login"?"site-header is-compact":"site-header"}>
+  return <header className={compact || isAuthRoute?"site-header is-compact":"site-header"}>
     <div className="topbar"><div className="topbar-inner page-shell-wide">
       <Link href="/" className="brand"><img src="https://axtar.az/img/logo.svg" alt="axtar.az"/></Link>
       <button className="icon-button menu-toggle" aria-label="Menyu" onClick={()=>setMobileMenu(!mobileMenu)}>{mobileMenu?<X size={20}/>:<Menu size={20}/>}</button>

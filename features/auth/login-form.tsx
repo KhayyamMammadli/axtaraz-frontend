@@ -67,13 +67,9 @@ export function LoginForm() {
           <input type="checkbox" name="remember" />
           <span>Məni yadda saxla</span>
         </label>
-        <button
-          type="button"
-          className={styles.forgot}
-          onClick={() => setMessage("Şifrə bərpa xidməti hələ qoşulmayıb.")}
-        >
+        <Link href="/forgot-password" className={styles.forgot}>
           Şifrəni unutmusunuz?
-        </button>
+        </Link>
       </div>
 
       <button className={styles.submit} type="submit">Daxil olun</button>
