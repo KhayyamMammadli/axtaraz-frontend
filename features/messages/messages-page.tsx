@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import {
   ArrowLeft, CheckCheck, ChevronDown, Filter, Heart, Image as ImageIcon,
   MessageCircle, MoreVertical, Paperclip, Search, Send, Smile, X,
@@ -94,6 +94,7 @@ export function MessagesPage() {
   const [messageText, setMessageText] = useState("");
   const [attachmentName, setAttachmentName] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
+  const messagesContainer = useRef<HTMLDivElement>(null);
 
   const visibleConversations = useMemo(() => {
     const normalizedSearch = search.trim().toLocaleLowerCase("az");
@@ -114,6 +115,12 @@ export function MessagesPage() {
   }, [activeTab, conversations, filters, search]);
 
   const selectedConversation = conversations.find((item) => item.id === selectedId) ?? null;
+
+  useEffect(() => {
+    const container = messagesContainer.current;
+    if (!container) return;
+    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+  }, [selectedId, selectedConversation?.messages.length]);
 
   function openFilter() {
     setDraftFilters(filters);
@@ -216,7 +223,7 @@ export function MessagesPage() {
                 </a>
               )}
 
-              <div className={styles.chatMessages}>
+              <div className={styles.chatMessages} ref={messagesContainer}>
                 {selectedConversation.messages.map((item, index) => (
                   <div key={item.id} className={styles.messageGroup}>
                     {index === 0 && <time className={styles.dayLabel}>{item.time}</time>}
