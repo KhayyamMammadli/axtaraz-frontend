@@ -237,3 +237,14 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
   .business-section>.section-heading h2{font-size:20px;gap:7px}
   .business-section>.section-heading .heading-emoji{font-size:18px}
 }
+
+/* Messages workspace header */
+.site-header.messages-header .topbar-inner{width:min(1806px,calc(100% - 48px));max-width:1806px;height:106px}
+.site-header.messages-header .searchbar-wrap,.site-header.messages-header .compact-header{display:none!important}
+.site-header.messages-header .message-header-icon{position:relative;width:42px;height:42px;color:#344052}
+.site-header.messages-header .message-header-icon>span{position:absolute;top:-2px;right:-2px;min-width:22px;height:22px;padding:0 5px;display:grid;place-items:center;border:2px solid #fff;border-radius:12px;background:#fa3a4d;color:#fff;font-size:12px;line-height:1}
+.site-header.messages-header .message-profile{height:68px;display:flex;align-items:center;gap:15px;padding:5px 16px 5px 9px;border-radius:34px;background:#f5f6f8;color:#263043}
+.site-header.messages-header .message-profile>svg:first-child{width:56px;height:56px;padding:11px;border-radius:50%;background:#202b3c;color:#fff}
+.site-header.messages-header .account-actions{gap:20px}
+@media(max-width:900px){.site-header.messages-header .topbar-inner{width:calc(100% - 32px);height:82px}.site-header.messages-header .account-actions{gap:10px}}
+@media(max-width:640px){.site-header.messages-header .topbar-inner{width:calc(100% - 24px);height:66px}.site-header.messages-header .message-profile{height:44px;gap:6px;padding:3px 8px 3px 4px}.site-header.messages-header .message-profile>svg:first-child{width:36px;height:36px;padding:7px}.site-header.messages-header .account-actions{gap:3px}}
