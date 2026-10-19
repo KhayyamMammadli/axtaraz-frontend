@@ -13,7 +13,7 @@ const socialNetworks = ["Facebook", "Instagram", "Linkedin", "WhatsApp"];
 export function SiteFooter() {
   return (
     <footer className="site-footer">
-      <div className="footer-inner">
+      <div className="footer-inner page-shell-wide">
         <div className="footer-brand-col">
           <Link href="/" className="brand footer-brand">
             <img src="https://axtar.az/img/logo.svg" alt="axtar.az" />
@@ -69,7 +69,7 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="footer-disclaimer">
+      <div className="footer-disclaimer page-shell-wide">
         <CircleAlert size={27} fill="currentColor" aria-hidden="true" />
         <div>
           <strong>Axtar.az elanların məzmununa görə məsuliyyət daşımır.</strong>
@@ -77,7 +77,7 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="footer-bottom">
+      <div className="footer-bottom page-shell-wide">
         <span>© Müəllif hüquqları qorunur 2026</span>
         <img src="https://axtar.az/img/payment-item.svg" alt="Ödəniş üsulları" />
       </div>
