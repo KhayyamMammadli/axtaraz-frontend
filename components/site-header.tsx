@@ -48,7 +48,7 @@ export function SiteHeader(){
       <Link href="/" className="brand"><img src="https://axtar.az/img/logo.svg" alt="axtar.az"/></Link>
       <button className="icon-button menu-toggle" aria-label="Menyu" onClick={()=>setMobileMenu(!mobileMenu)}>{mobileMenu?<X size={20}/>:<Menu size={20}/>}</button>
       <nav className={mobileMenu?"main-nav is-open":"main-nav"}>
-        <Link className={pathname.startsWith("/full-search")?"active":""} href="/full-search?title=Televizor">Elanlar</Link>
+        <Link className={pathname.startsWith("/full-search")?"active":""} href="/full-search">Elanlar</Link>
         <Link className={pathname.startsWith("/ownership")?"active":""} href="/ownerships">Bizneslər</Link>
         <Link className={pathname.startsWith("/post")?"active":""} href="/posts">Bloqlar</Link>
       </nav>
