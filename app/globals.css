@@ -322,3 +322,9 @@ body{font-family:Geist,Arial,Helvetica,sans-serif}
 }
 .favorite-remove-button{width:36px;height:36px;border:0;border-radius:11px;background:#fff;color:#fa3a4d;display:grid;place-items:center;box-shadow:0 2px 8px #0002}.favorite-blog-card{position:relative;min-width:0;border:1px solid #eceef1;border-radius:15px;overflow:hidden;background:#fff;box-shadow:0 3px 9px rgba(20,25,35,.035)}.favorite-blog-image{height:190px;display:block;background:#f3f4f6;overflow:hidden}.favorite-blog-image img{width:100%;height:100%;object-fit:cover}.favorite-blog-remove{position:absolute;right:12px;top:12px}.favorite-blog-copy{padding:14px 15px 17px}.favorite-blog-copy h2{font-size:17px;line-height:1.3;margin:0 0 7px}.favorite-blog-copy p{font-size:13px;line-height:1.55;color:#767d89;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.business-toolbar .favorite-remove-button{background:#fff}
 @media(max-width:600px){.favorite-blog-image{height:200px}.favorite-blog-copy{padding:12px}.favorite-blog-copy h2{font-size:16px}}
+
+/* Search listing results: five cards per desktop row. */
+.search-results .listing-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+@media(max-width:1100px){.search-results .listing-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}}
+@media(max-width:900px){.search-results .listing-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}}
+@media(max-width:640px){.search-results .listing-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}}
