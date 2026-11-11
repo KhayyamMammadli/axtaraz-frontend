@@ -10,7 +10,7 @@
 }
 
 .layout {
-  width: min(1240px, calc(100vw - 48px));
+  width: min(var(--container-width), calc(100vw - 48px));
   min-height: min(740px, calc(100svh - 140px));
   display: grid;
   grid-template-columns: minmax(420px, 490px) minmax(0, 1fr);

@@ -11,19 +11,23 @@
 .chips{gap:11px}
 .menu{min-width:270px}
 .menu button{height:48px;padding-inline:24px;font-size:14px}
-.drawer{width:min(500px,94vw)}
-.drawerHeader{height:82px;padding-inline:28px}
-.drawerHeader h2{font-size:25px}
-.drawerBody{padding:8px 28px 24px}
-.filterSection{padding:17px 0 19px}
-.filterSection h3{font-size:16px;margin-bottom:15px}
-.checkPill{font-size:14px;padding:7px 10px;margin-bottom:10px}
-.checkPill input{width:20px;height:20px}
-.colors{grid-template-columns:repeat(7,32px);gap:14px 20px}
-.colors i{width:32px;height:32px;border-radius:9px}
+.drawer{width:min(380px,94vw);animation:drawerSlideIn 280ms cubic-bezier(.22,1,.36,1)}
+.backdrop{animation:drawerBackdropIn 280ms ease-out}
+@keyframes drawerSlideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+@keyframes drawerBackdropIn{from{background:rgba(0,0,0,0)}to{background:rgba(0,0,0,.62)}}
+@media(prefers-reduced-motion:reduce){.drawer,.backdrop{animation:none}}
+.drawerHeader{height:68px;padding-inline:22px}
+.drawerHeader h2{font-size:22px}
+.drawerBody{padding:6px 22px 20px;min-height:0}
+.filterSection{padding:14px 0 16px}
+.filterSection h3{font-size:15px;margin-bottom:12px}
+.checkPill{font-size:13px;padding:6px 9px;margin-bottom:8px;gap:8px}
+.checkPill input{width:18px;height:18px}
+.colors{grid-template-columns:repeat(7,minmax(0,1fr));gap:12px 14px}
+.colors i{width:28px;height:28px;max-width:100%;border-radius:8px}
 .more{font-size:14px}
-.drawerFooter{padding:12px 28px 20px;gap:12px}
-.drawerFooter button{height:50px;border-radius:16px;font-size:14px}
+.drawerFooter{padding:12px 22px 18px;gap:10px}
+.drawerFooter button{height:44px;border-radius:14px;font-size:13px}
 @media(max-width:900px){
  .wrap{gap:7px;padding:16px 0}
  .filterButton{height:44px;padding-inline:14px;font-size:13px}
@@ -65,3 +69,15 @@
 
 /* Keep a clear 10px separation between the filters and listing cards. */
 .wrap{margin-bottom:10px}
+
+/* Scroll controls sit over the ends while the filter button stays fixed. */
+.filterButton{position:relative;z-index:2}
+.leftArrow,.rightArrow{position:absolute;z-index:3;width:36px;height:36px;background:#fff;box-shadow:0 0 14px 8px #fff}
+.leftArrow{left:110px}
+.rightArrow{right:0}
+.arrow:disabled{visibility:hidden;pointer-events:none}
+.select span{flex:1;text-align:center}
+.discountIcon{color:#b548ff;fill:#b548ff}
+.checkPill input:checked{background:#4864ff;border-color:#4864ff;box-shadow:none}
+.checkPill input:checked:after{content:"";display:block;width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);margin:0 auto}
+@media(max-width:600px){.leftArrow{left:90px}.leftArrow,.rightArrow{width:30px;height:30px}}

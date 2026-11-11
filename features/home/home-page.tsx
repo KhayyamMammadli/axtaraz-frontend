@@ -4,17 +4,11 @@ import { PremiumBusinesses } from "./premium-businesses";
 import { getProducts } from "@/features/listings/api";
 import { FeedTabs } from "./feed-tabs";
 import { ListingCard } from "@/features/listings/listing-card";
-import {
-  formatPostDate,
-  getPostAuthor,
-  getPostImage,
-  getPosts,
-} from "@/features/posts/api";
+import { getPosts } from "@/features/posts/api";
+import { PostCard } from "@/features/posts/post-card";
 
 export async function HomePage() {
   const [listings, posts] = await Promise.all([getProducts(), getPosts()]);
-  const featuredPost = posts[0];
-  const otherPosts = posts.slice(1, 4);
 
   return (
     <div className="page-shell">
@@ -46,50 +40,12 @@ export async function HomePage() {
           </div>
           <Link href="/posts">Hamısına bax <ArrowRight size={15} /></Link>
         </div>
-        {featuredPost ? (
-          <div className="blog-layout">
-            <article className="blog-feature">
-              <Link href={`/post/${featuredPost.slug}`} className="blog-feature-image">
-                {getPostImage(featuredPost) && (
-                  <img src={getPostImage(featuredPost)} alt={featuredPost.title} />
-                )}
-              </Link>
-              <div className="blog-feature-body">
-                <h3><Link href={`/post/${featuredPost.slug}`}>{featuredPost.title}</Link></h3>
-                <p>{featuredPost.short_description || featuredPost.description || ""}</p>
-                <small>
-                  {[getPostAuthor(featuredPost), formatPostDate(featuredPost.created_at), `${featuredPost.view_count ?? 0} baxış`]
-                    .filter(Boolean)
-                    .join(" · ")}
-                </small>
-              </div>
-              <Link className="related-listings" href={`/post/${featuredPost.slug}`}>
-                <strong>{featuredPost.view_count ?? 0} baxış</strong>
-                <span>Məqaləni oxumağa davam edin <ArrowRight size={15} /></span>
-              </Link>
-            </article>
-            <div className="blog-list">
-              {otherPosts.map((post) => (
-                <article className="blog-mini" key={post.id}>
-                  <Link href={`/post/${post.slug}`} className="blog-mini-image">
-                    {getPostImage(post) && <img src={getPostImage(post)} alt={post.title} />}
-                  </Link>
-                  <div>
-                    <h3><Link href={`/post/${post.slug}`}>{post.title}</Link></h3>
-                    <p>{post.short_description || post.description || ""}</p>
-                    <span>
-                      {[formatPostDate(post.created_at), `${post.view_count ?? 0} baxış`]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </span>
-                  </div>
-                </article>
-              ))}
-            </div>
+        {posts.length ? (
+          <div className="blog-directory">
+            {posts.slice(0, 4).map(post => <PostCard key={post.id} post={post} />)}
           </div>
-        ) : (
-          <p>Hazırda göstəriləcək bloq yoxdur.</p>
-        )}
+        ) : <p>Hazırda göstəriləcək bloq yoxdur.</p>}
+
       </section>
     </div>
   );

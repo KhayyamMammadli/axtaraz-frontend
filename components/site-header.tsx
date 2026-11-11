@@ -2,21 +2,26 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { ChevronDown, Heart, List, MapPin, Menu, MessageCircle, Plus, Search, X } from "lucide-react";
-const regions=["Bütün bölgələr","Bakı","Sumqayıt","Gəncə","Mingəçevir","Lənkəran","Şəki","Quba"];
+import { Heart, List, Menu, MessageCircle, Search, X } from "lucide-react";
+import { CreateMenu } from "./create-menu";
+import { RegionPicker } from "./region-picker";
 const categories=["Hazır bizneslər","Heyvanlar","Uşaqlar üçün","İtmiş əşyalar","Geyimlər, Kişi, Qadın, Uşaq","İdman və əyləncə","Zoo məhsullar","Təmir və tikinti","Məişət texnikası","Ev və bağ üçün","Komputerlər","Qida məhsulları","Restoranlar Kafelər","Qızıl zinət əşyaları","Tibbi məhsullar","Şəxsi əşyalar","Avadanlıqlar","Bazarlıq","Telefonlar","Xidmətlər","Daşınmaz əmlak","Elektronika"];
 
-function SearchForm({ query, setQuery, region, setRegion, compact = false }: {
+function SearchForm({ query, setQuery, region, setRegion, metros, setMetros, compact = false }: {
   query: string;
   setQuery: (value: string) => void;
-  region: string;
-  setRegion: (value: string) => void;
+  region: string[];
+  setRegion: (value: string[]) => void;
+  metros: string[];
+  setMetros: (value: string[]) => void;
   compact?: boolean;
 }) {
   return <form action="/full-search" className={compact ? "main-search compact-search" : "main-search"}>
     <Search size={18}/>
     <input name="title" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Axtar..." aria-label="Elan axtar"/>
-    <label className="region-select"><MapPin size={16}/><select name="location" value={region} onChange={e=>setRegion(e.target.value)}>{regions.map(x=><option key={x} value={x==="Bütün bölgələr"?"":x}>{x}</option>)}</select><ChevronDown size={15}/></label>
+    <RegionPicker value={region} onChange={setRegion} metros={metros} onMetrosChange={setMetros}/>
+    {metros.map(value => <input type="hidden" name="metro" value={value} key={value}/>)}
+    {region.map(value => <input type="hidden" name="location" value={value} key={value}/>)}
     <button className="search-submit" aria-label="Axtar"><Search size={18}/></button>
   </form>;
 }
@@ -25,7 +30,8 @@ function CatalogPanel({ close }: { close: () => void }) {
 }
 export function SiteHeader(){
   const pathname=usePathname();
-  const[query,setQuery]=useState(""),[region,setRegion]=useState("Bütün bölgələr"),[catalogOpen,setCatalogOpen]=useState(false),[mobileMenu,setMobileMenu]=useState(false),[compact,setCompact]=useState(false);
+  const[query,setQuery]=useState(""),[region,setRegion]=useState<string[]>([]),[catalogOpen,setCatalogOpen]=useState(false),[mobileMenu,setMobileMenu]=useState(false),[compact,setCompact]=useState(false);
+  const [metros,setMetros]=useState<string[]>([]);
   const compactRef=useRef(false);
   const isAuthRoute = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password";
   useEffect(()=>{
@@ -56,8 +62,8 @@ export function SiteHeader(){
     </div></div>
     <div className="searchbar-wrap page-shell-wide"><div className="searchbar">
       <button className={catalogOpen?"catalog-button is-open":"catalog-button"} onClick={()=>setCatalogOpen(!catalogOpen)}><span className="catalog-glyph">☷</span>Kataloq</button>
-      <SearchForm query={query} setQuery={setQuery} region={region} setRegion={setRegion}/>
-      <Link href="/product/create" className="new-button"><Plus size={20}/>Yeni</Link>
+      <SearchForm query={query} setQuery={setQuery} region={region} setRegion={setRegion} metros={metros} setMetros={setMetros}/>
+      <CreateMenu/>
     </div>{catalogOpen&&<CatalogPanel close={()=>setCatalogOpen(false)}/>}</div>
     <div className="compact-header page-shell-wide">
       <Link href="/" className="compact-brand" aria-label="axtar.az"><img src="https://axtar.az/img/logo.svg" alt=""/></Link>
@@ -65,8 +71,8 @@ export function SiteHeader(){
         <button className={catalogOpen?"compact-catalog is-open":"compact-catalog"} onClick={()=>setCatalogOpen(!catalogOpen)} aria-label="Kataloq"><List size={22}/></button>
         {catalogOpen&&<CatalogPanel close={()=>setCatalogOpen(false)}/>}
       </div>
-      <SearchForm query={query} setQuery={setQuery} region={region} setRegion={setRegion} compact/>
-      <Link href="/product/create" className="compact-create" aria-label="Yeni elan"><Plus size={22}/></Link>
+      <SearchForm query={query} setQuery={setQuery} region={region} setRegion={setRegion} metros={metros} setMetros={setMetros} compact/>
+      <CreateMenu compact/>
       <Link className="compact-favorite" href="/favorites" aria-label="Seçilmişlər"><Heart size={22}/><span className="favorites-badge">5</span></Link>
       <Link className="compact-message" href="/messages" aria-label="Mesajlar"><MessageCircle size={21}/></Link>
       <Link className="compact-login" href="/login">Daxil ol</Link>
