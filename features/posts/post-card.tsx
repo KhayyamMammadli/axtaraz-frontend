@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Trash2, Tag, ArrowRight, BadgeCheck, CircleUserRound } from "lucide-react";
+import { Pencil, Trash2, Tag, ArrowRight, BadgeCheck, CircleUserRound } from "lucide-react";
 import { formatPostDate, getPostAuthor, getPostImage, type BlogPost } from "./api";
 import styles from "./post-card.module.css";
 
-export function PostCard({ post, onRemoveFavorite }: { post: BlogPost; onRemoveFavorite?: () => void }) {
+export function PostCard({ post, onRemoveFavorite, onEdit, onDelete }: { post: BlogPost; onRemoveFavorite?: () => void; onEdit?: () => void; onDelete?: () => void }) {
   if (onRemoveFavorite) return <article className="favorite-blog-card">
     <Link href={`/post/${post.slug}`} className="favorite-blog-image">{getPostImage(post) && <img src={getPostImage(post)} alt={post.title} />}</Link>
     <button className="favorite-remove-button favorite-blog-remove" type="button" aria-label="Bloqu favoritlərdən sil" onClick={onRemoveFavorite}><Trash2 size={17}/></button>
@@ -15,7 +15,11 @@ export function PostCard({ post, onRemoveFavorite }: { post: BlogPost; onRemoveF
   const author = getPostAuthor(post);
   const image = getPostImage(post);
   const href = `/post/${post.slug}`;
-  return <article className={styles.card}>
+  return <article className={`${styles.card} ${onEdit || onDelete ? styles.managedCard : ""}`}>
+    {(onEdit || onDelete) && <div className={styles.ownerActions}>
+      {onEdit && <button type="button" onClick={onEdit} aria-label={`${post.title} — redaktə et`}><Pencil size={16}/></button>}
+      {onDelete && <button type="button" onClick={onDelete} aria-label={`${post.title} — sil`}><Trash2 size={16}/></button>}
+    </div>}
     <Link href={href} className={styles.image} aria-label={post.title}>
       {image && <img src={image} alt={post.title} loading="lazy" />}
     </Link>

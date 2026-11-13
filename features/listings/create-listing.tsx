@@ -2,19 +2,63 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
+import { CustomSelect } from "@/components/custom-select";
+import type { Listing } from "./data";
+import { mockUser, useMockSession } from "@/features/auth/mock-session";
 import { ArrowLeft, ArrowRight, UploadCloud, ImageIcon, Info, Trash2, Plus, Eye, EyeOff, MapPin, ShieldCheck, Phone, CircleCheck, MoreHorizontal, ChevronRight, Gift } from "lucide-react";
 import styles from "./create-listing.module.css";
 const categories = ["Nəqliyyat", "Elektronika", "Daşınmaz əmlak", "Xidmətlər", "Telefonlar", "Şəxsi əşyalar", "Kompüterlər", "Ev və bağ üçün", "Məişət texnikası", "Təmir və tikinti"];
 const days = ["Bazar ertəsi", "Çərşənbə axşamı", "Çərşənbə", "Cümə axşamı", "Cümə", "Şənbə", "Bazar"];
 type Photo = { id: string; url: string; name: string };
-export function CreateListing({ variant = "offer" }: { variant?: "offer" | "wanted" | "lost" }) {
+export function CreateListing({ variant = "offer", initialListing }: { variant?: "offer" | "wanted" | "lost"; initialListing?: Listing }) {
+  const loggedIn = useMockSession();
+  const [mobileViewport, setMobileViewport] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const previewRef = useRef<HTMLElement>(null);
+  const previewTrigger = useRef<HTMLButtonElement>(null);
+  const previewBack = useRef<HTMLButtonElement>(null);
+  const editorRef = useRef<HTMLFormElement>(null);
+  const editorScroll = useRef(0);
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 760px)");
+    const update = () => { setMobileViewport(media.matches); if (!media.matches) setPreviewOpen(false); };
+    update(); media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+  useEffect(() => {
+    if (!previewOpen || !mobileViewport) return;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    previewRef.current?.scrollTo(0, 0);
+    previewBack.current?.focus({ preventScroll: true });
+    const key = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setPreviewOpen(false); previewTrigger.current?.focus({ preventScroll: true }); }
+      if (event.key === "Tab") {
+        const buttons = previewRef.current?.querySelectorAll<HTMLButtonElement>("button:not([disabled])");
+        const first = buttons?.[0], last = buttons?.[buttons.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+      }
+    };
+    document.addEventListener("keydown", key);
+    return () => { document.body.style.overflow = overflow; document.removeEventListener("keydown", key); };
+  }, [previewOpen, mobileViewport]);
+  function closePreview() { setPreviewOpen(false); window.scrollTo(0, editorScroll.current); previewTrigger.current?.focus({ preventScroll: true }); }
+  function publishPreview() {
+    closePreview();
+    requestAnimationFrame(() => editorRef.current?.requestSubmit());
+  }
   const isLost = variant === "lost";
   const [rewardEnabled, setRewardEnabled] = useState(false);
   const isWanted = variant === "wanted";
   const priceLabel = isWanted ? "Təxmini büdcə" : "Qiymət";
-  const [data, setData] = useState({ category: "", title: "", price: "", city: "", description: "", address: "", first: "", last: "", email: "", phone: "", password: "", confirm: "", store: "", lostAt: "", approximateAt: "", reward: "" });
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [cover, setCover] = useState("");
+  const [data, setData] = useState({ category: initialListing?.category || "", title: initialListing?.title || "", price: initialListing?.price.replace(/[^\d.,]/g, "").replace(",", ".") || "", city: initialListing?.location || "", description: initialListing?.description || "", address: initialListing?.address || "", first: initialListing ? mockUser.name.split(" ")[0] : "", last: initialListing ? mockUser.name.split(" ").slice(1).join(" ") : "", email: initialListing ? mockUser.email : "", phone: initialListing?.phone || "", password: "", confirm: "", store: "", lostAt: "", approximateAt: "", reward: "" });
+  const [photos, setPhotos] = useState<Photo[]>(() => initialListing?.image ? [{ id: `existing-${initialListing.id}`, url: initialListing.image, name: initialListing.title }] : []);
+  const [cover, setCover] = useState(initialListing?.image ? `existing-${initialListing.id}` : "");
+  useEffect(() => {
+    if (!loggedIn) return;
+    setData(current => ({ ...current, first: current.first || mockUser.name.split(" ")[0], last: current.last || mockUser.name.split(" ").slice(1).join(" "), email: current.email || mockUser.email }));
+  }, [loggedIn]);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [sameHours, setSameHours] = useState(false);
@@ -39,21 +83,21 @@ export function CreateListing({ variant = "offer" }: { variant?: "offer" | "want
   function submit(event: FormEvent) {
     event.preventDefault(); setNotice("");
     if (!photos.length) { setError("Minimum 1 şəkil əlavə edin."); inputRef.current?.focus(); return; }
-    if (data.password !== data.confirm) { setError("Şifrələr eyni olmalıdır."); return; }
+    if (!loggedIn && data.password !== data.confirm) { setError("Şifrələr eyni olmalıdır."); return; }
     setError(""); setNotice("Önbaxış hazırdır. Elanı yayımlamaq üçün server bağlantısı hələ qoşulmayıb.");
   }
   const image = photos.find(photo => photo.id === cover)?.url;
   return <div className={styles.page} data-listing-editor><div className="page-shell">
-    <div className={styles.heading}><Link href="/full-search" aria-label="Elanlara qayıt"><ArrowLeft size={22}/></Link><h1>{isLost ? "Yeni itkin elan yarat" : isWanted ? "Elan axtar" : "Yeni elan yerləşdir"}</h1></div>
+    <div className={styles.heading} inert={mobileViewport && previewOpen}><Link href={initialListing ? "/account/listings" : "/full-search"} aria-label="Elanlara qayıt"><ArrowLeft size={22}/></Link><h1>{initialListing ? isLost ? "İtkin elanı redaktə et" : isWanted ? "Axtarılır elanını redaktə et" : "Elanı redaktə et" : isLost ? "Yeni itkin elan yarat" : isWanted ? "Elan axtar" : "Yeni elan yerləşdir"}</h1></div>
     <div className={styles.layout}>
-      <form className={styles.form} onSubmit={submit}>
+      <form ref={editorRef} id="listing-editor-form" className={styles.form} onSubmit={submit} inert={mobileViewport && previewOpen}>
         <section className={styles.panel}><h2>{isLost ? "İtkin haqqında məlumat" : "Elan haqqında məlumatlar"}</h2><div className={styles.fields}>
-          <label>Kateqoriya seçimi <em>*</em><select required {...field("category")}><option value="">Seçin</option>{categories.map(value => <option key={value}>{value}</option>)}</select></label>
+          <div><label htmlFor="listing-category">Kateqoriya seçimi <em>*</em></label><CustomSelect id="listing-category" name="category" label="Kateqoriya seçimi" required value={data.category} onChange={value => setData(current => ({...current, category: value}))} options={categories.map(value => ({value, label:value}))}/></div>
           <label>Elanın adı <em>*</em><input required maxLength={100} placeholder="Placeholder text..." {...field("title")}/></label>
           <label>{priceLabel} <em>*</em><input required type="number" min="0" step="0.01" placeholder="Placeholder text..." {...field("price")}/></label>
-          <label>Şəhər <em>*</em><select required {...field("city")}><option value="">Seçin</option>{["Bakı","Sumqayıt","Gəncə","Mingəçevir","Lənkəran","Şəki","Quba"].map(value => <option key={value}>{value}</option>)}</select></label>
+          <div><label htmlFor="listing-city">Şəhər <em>*</em></label><CustomSelect id="listing-city" name="city" label="Şəhər" required value={data.city} onChange={value => setData(current => ({...current, city: value}))} options={["Bakı","Sumqayıt","Gəncə","Mingəçevir","Lənkəran","Şəki","Quba"].map(value => ({value, label:value}))}/></div>
+          <div><label htmlFor="listing-store">Mağaza</label><CustomSelect id="listing-store" name="store" label="Mağaza" value={data.store} onChange={value => setData(current => ({...current, store:value}))} options={[{value:"personal",label:"Şəxsi elan"}]}/></div>
           {isLost && <>
-            <label>Mağaza<select {...field("store")}><option value="">Seçin</option><option value="personal">Şəxsi elan</option></select></label>
             <label>İtmə vaxtı <em>*</em><input required type="datetime-local" {...field("lostAt")}/></label>
             <label>Təxmini vaxt <em>*</em><input required type="datetime-local" {...field("approximateAt")}/></label>
           </>}
@@ -80,10 +124,12 @@ export function CreateListing({ variant = "offer" }: { variant?: "offer" | "want
         <section className={styles.panel}><h2>Əlaqə məlumatlarınız</h2><div className={styles.fields}>
           <label>Ad <em>*</em><input required autoComplete="given-name" placeholder="Adınızı yazın" {...field("first")}/></label><label>Soyad <em>*</em><input required autoComplete="family-name" placeholder="Soyadınızı yazın" {...field("last")}/></label>
           <label>E-mail <em>*</em><input required type="email" autoComplete="email" placeholder="E-mail ünvanınızı yazın" {...field("email")}/></label><label>Mobil nömrə <em>*</em><div className={styles.phone}><span>🇦🇿</span><strong>+994</strong><input required type="tel" autoComplete="tel-national" pattern="[0-9 ()-]{9,16}" placeholder="(050) 000-00-00" {...field("phone")}/></div></label>
-          {(["password","confirm"] as const).map(key => <label key={key}>{key === "password" ? "Şifrə" : "Şifrənin təkrarı"} <em>*</em><div className={styles.password}><input required minLength={8} autoComplete="new-password" type={visible[key] ? "text" : "password"} placeholder={key === "password" ? "Şifrənizi yazın" : "Şifrənizi təkrarlayın"} {...field(key)}/><button type="button" aria-label="Şifrəni göstər/gizlət" onClick={() => setVisible(current => ({...current,[key]:!current[key]}))}>{visible[key] ? <EyeOff size={20}/> : <Eye size={20}/>}</button></div></label>)}
+          {!loggedIn && (["password","confirm"] as const).map(key => <label key={key}>{key === "password" ? "Şifrə" : "Şifrənin təkrarı"} <em>*</em><div className={styles.password}><input required minLength={8} autoComplete="new-password" type={visible[key] ? "text" : "password"} placeholder={key === "password" ? "Şifrənizi yazın" : "Şifrənizi təkrarlayın"} {...field(key)}/><button type="button" aria-label="Şifrəni göstər/gizlət" onClick={() => setVisible(current => ({...current,[key]:!current[key]}))}>{visible[key] ? <EyeOff size={20}/> : <Eye size={20}/>}</button></div></label>)}
         </div><div className={styles.info}><Info size={17}/>Gizliliyinizi qoruyuruq. Məlumatlarınızı üçüncü şəxslərlə paylaşmırıq.</div>{error && <p className={styles.error} role="alert">{error}</p>}{notice && <p className={styles.info} role="status">{notice}</p>}<button className={styles.submit} type="submit">Elanı yerləşdir <ArrowRight size={21}/></button></section>
       </form>
-      <aside className={styles.preview}><h2>Elanınız belə görünəcək</h2><div className={styles.previewCard}><nav>Ana səhifə <ChevronRight size={15}/>{data.category || "Kateqoriya"}<ChevronRight size={15}/>Elan</nav><div className={styles.previewTitle}><h3>{data.title || "Elanın adı burada görünəcək"}</h3><MoreHorizontal size={23}/></div><div className={styles.previewGrid}><div><div className={styles.previewImage}>{image ? <img src={image} alt={data.title || "Elanın ön şəkli"}/> : <><ImageIcon size={62}/><strong>Şəkil əlavə edilməyib</strong></>}</div><div className={styles.facts}>{[[priceLabel,`${data.price || 0} ₼`],["Kateqoriya",data.category || "Seçin"],["Tarix",date],["Elan nömrəsi","—"]].map(([label,value]) => <div key={label}><span>{label}</span><strong>{value}</strong></div>)}</div><div className={styles.description}><h4>{isLost ? "İtkin haqqında məlumat" : "Elanın təsviri"}</h4>{isLost && rewardEnabled && data.reward && <div className={styles.rewardPreview}><Gift size={17}/>{data.reward} ₼ mükafat</div>}<p>{data.description || "Elan haqqında daxil etdiyiniz məlumat burada görünəcək."}</p><span>Daha ətraflı →</span></div><div className={styles.stats}><span><Eye size={12}/>Baxış: 0</span><span>ID: —</span><span>Saxla</span><span>24 saat qalır</span></div></div><div className={styles.seller}><strong className={styles.price}>{data.price || 0} ₼</strong><div className={styles.owner}><span className={styles.avatar}/><div><small>Elan sahibi</small><strong>{[data.first,data.last].filter(Boolean).join(" ") || "İstifadəçi"}</strong><small className={styles.green}>● Onlayndır</small></div></div><p className={styles.green}><CircleCheck size={13}/>Aktivdir</p><div className={styles.previewActions}><span>İzlə</span><span className={styles.green}><Phone size={13}/>+994 {data.phone || "50 000 00 00"}</span><span>Mesaj yaz</span></div><div className={styles.miniPanel}><strong>Ünvan</strong><span className={styles.blue}>Xəritədə göstər →</span><div className={styles.miniMap}><MapPin size={31}/>{data.address && <small>{data.address}</small>}</div></div><div className={styles.safety}><ShieldCheck size={26}/><div><strong>Təhlükəsiz alış-veriş üçün məsləhətlər</strong><p>Nağd ödəniş edərkən diqqətli olun.</p><span>Ətraflı oxu →</span></div></div></div></div></div></aside>
+      <button ref={previewTrigger} type="button" className={styles.previewTrigger} aria-label="Elanın önbaxışını aç" aria-expanded={previewOpen} aria-controls="listing-mobile-preview" onClick={() => { editorScroll.current = window.scrollY; setPreviewOpen(true); }}><Eye size={25}/></button>
+      <div className={styles.mobilePublish} inert={previewOpen}><button type="submit" form="listing-editor-form">{initialListing ? "Dəyişiklikləri saxla" : "Elanı yerləşdir"}<ArrowRight size={19}/></button></div>
+      <aside ref={previewRef} id="listing-mobile-preview" className={`${styles.preview} ${previewOpen ? styles.previewOpen : ""}`} role={mobileViewport ? "dialog" : undefined} aria-modal={mobileViewport && previewOpen ? true : undefined} aria-label="Elanın önbaxışı" inert={mobileViewport && !previewOpen}><header className={styles.mobilePreviewHeader}><button ref={previewBack} type="button" onClick={closePreview} aria-label="Redaktəyə qayıt"><ArrowLeft size={20}/></button><strong>Elanınız belə görünəcək</strong></header><h2>Elanınız belə görünəcək</h2><div className={styles.previewCard}><nav>Ana səhifə <ChevronRight size={15}/>{data.category || "Kateqoriya"}<ChevronRight size={15}/>Elan</nav><div className={styles.previewTitle}><h3>{data.title || "Elanın adı burada görünəcək"}</h3><MoreHorizontal size={23}/></div><div className={styles.previewGrid}><div><div className={styles.previewImage}>{image ? <img src={image} alt={data.title || "Elanın ön şəkli"}/> : <><ImageIcon size={62}/><strong>Şəkil əlavə edilməyib</strong></>}</div><div className={styles.facts}>{[[priceLabel,`${data.price || 0} ₼`],["Kateqoriya",data.category || "Seçin"],["Tarix",date],["Elan nömrəsi","—"]].map(([label,value]) => <div key={label}><span>{label}</span><strong>{value}</strong></div>)}</div><div className={styles.description}><h4>{isLost ? "İtkin haqqında məlumat" : "Elanın təsviri"}</h4>{isLost && rewardEnabled && data.reward && <div className={styles.rewardPreview}><Gift size={17}/>{data.reward} ₼ mükafat</div>}<p>{data.description || "Elan haqqında daxil etdiyiniz məlumat burada görünəcək."}</p><span>Daha ətraflı →</span></div><div className={styles.stats}><span><Eye size={12}/>Baxış: 0</span><span>ID: —</span><span>Saxla</span><span>24 saat qalır</span></div></div><div className={styles.seller}><strong className={styles.price}>{data.price || 0} ₼</strong><div className={styles.owner}><span className={styles.avatar}/><div><small>Elan sahibi</small><strong>{[data.first,data.last].filter(Boolean).join(" ") || "İstifadəçi"}</strong><small className={styles.green}>● Onlayndır</small></div></div><p className={styles.green}><CircleCheck size={13}/>Aktivdir</p><div className={styles.previewActions}><span>İzlə</span><span className={styles.green}><Phone size={13}/>+994 {data.phone || "50 000 00 00"}</span><span>Mesaj yaz</span></div><div className={styles.miniPanel}><strong>Ünvan</strong><span className={styles.blue}>Xəritədə göstər →</span><div className={styles.miniMap}><MapPin size={31}/>{data.address && <small>{data.address}</small>}</div></div><div className={styles.safety}><ShieldCheck size={26}/><div><strong>Təhlükəsiz alış-veriş üçün məsləhətlər</strong><p>Nağd ödəniş edərkən diqqətli olun.</p><span>Ətraflı oxu →</span></div></div></div></div></div><footer className={styles.mobilePreviewFooter}><button type="button" onClick={closePreview}>Redaktəyə qayıt</button><button type="button" onClick={publishPreview}>{initialListing ? "Yadda saxla" : "Elanı yerləşdir"}<ArrowRight size={17}/></button></footer></aside>
     </div>
   </div></div>;
 }

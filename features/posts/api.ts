@@ -20,6 +20,9 @@ export type BlogPost = {
   created_by?: BlogAuthor | null;
   ownership?: unknown;
   created_at?: string;
+  images?: (string | { image?: string; image_full?: string; url?: string })[];
+  images_full?: string[];
+  gallery?: (string | { image?: string; image_full?: string; url?: string })[];
 };
 
 type PostsResponse = {
@@ -47,13 +50,16 @@ export function getPostImage(post: BlogPost): string {
 
 export function formatPostDate(value?: string): string {
   if (!value) return "";
-  const date = new Date(value);
+  // API timestamps without an offset represent UTC; never use the browser's timezone.
+  const normalized = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/.test(value)
+    ? `${value.replace(" ", "T")}Z`
+    : value;
+  const date = new Date(normalized);
   if (!Number.isFinite(date.getTime())) return "";
-  return new Intl.DateTimeFormat("az-AZ", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(date);
+  // Explicit formatting avoids differences in server/browser ICU locale data.
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  return `${day}.${month}.${date.getUTCFullYear()}`;
 }
 
 export async function getPosts(): Promise<BlogPost[]> {

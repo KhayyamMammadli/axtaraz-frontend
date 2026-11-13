@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { MapPin, Mail, Phone, Tag, Search, CircleAlert } from "lucide-react";
 
@@ -9,8 +12,10 @@ const columns = [
 ];
 
 const socialNetworks = ["Facebook", "Instagram", "Linkedin", "WhatsApp"];
+const listingTypes = [{ id: "offer", label: "Təklif edilir", icon: Tag }, { id: "wanted", label: "Axtarılır", icon: Search }, { id: "lost", label: "İtkin", icon: CircleAlert }];
 
 export function SiteFooter() {
+  const [activeType, setActiveType] = useState("offer");
   return (
     <footer className="site-footer">
       <div className="footer-inner page-shell-wide">
@@ -34,16 +39,22 @@ export function SiteFooter() {
         </div>
 
         <div className="footer-category-col">
-          <div className="footer-type-tabs">
-            <span className="active"><Tag size={20} /> Təklif edilir</span>
-            <span><Search size={21} /> Axtarılır</span>
-            <span><CircleAlert size={20} /> İtkin</span>
+          <div className="footer-type-tabs" role="tablist" aria-label="Elan növü">
+            {listingTypes.map(({ id, label, icon: Icon }, index) => <button key={id} id={`footer-tab-${id}`} type="button" role="tab" aria-selected={activeType === id} aria-controls="footer-category-panel" tabIndex={activeType === id ? 0 : -1} className={activeType === id ? "active" : ""} onClick={() => setActiveType(id)} onKeyDown={event => {
+              let next = index;
+              if (event.key === "ArrowRight") next = (index + 1) % listingTypes.length;
+              else if (event.key === "ArrowLeft") next = (index - 1 + listingTypes.length) % listingTypes.length;
+              else if (event.key === "Home") next = 0;
+              else if (event.key === "End") next = listingTypes.length - 1;
+              else return;
+              event.preventDefault(); setActiveType(listingTypes[next].id); document.getElementById(`footer-tab-${listingTypes[next].id}`)?.focus();
+            }}><Icon size={20}/>{label}</button>)}
           </div>
-          <div className="footer-categories">
+          <div id="footer-category-panel" className="footer-categories" role="tabpanel" aria-labelledby={`footer-tab-${activeType}`}>
             {columns.map((column, index) => (
               <div key={index}>
                 {column.map((category) => (
-                  <Link key={category} href={`/full-search?title=${encodeURIComponent(category)}`}>
+                  <Link key={category} href={`/full-search?${new URLSearchParams({ title: category, type: activeType })}`}>
                     {category}<b aria-hidden="true">›</b>
                   </Link>
                 ))}

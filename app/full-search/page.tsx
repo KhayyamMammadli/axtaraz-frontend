@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { ListingCard } from "@/features/listings/listing-card";
 import { getProducts } from "@/features/listings/api";
 import { ListingFilterBar } from "@/features/listings/search-filters";
@@ -36,7 +35,6 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
         <h1 className="sr-only">{term ? `${params.title} elanları` : "Elanlar"}</h1>
         <div className="listing-grid">{results.map((item) => <ListingCard key={item.id} listing={item} />)}</div>
         {!results.length && <p className="empty-state">Elan tapılmadı</p>}
-        <Link className="all-listings-link" href="/">Ana səhifə</Link>
       </div>
     </div>
   );

@@ -7,6 +7,18 @@ export type Listing = {
   age: string;
   image: string;
   level?: string;
+  adType?: "offer" | "wanted" | "lost";
+  description?: string;
+  category?: string;
+  address?: string;
+  phone?: string;
+  images?: string[];
+  latitude?: number;
+  longitude?: number;
+  subway?: string;
+  views?: number;
+  seller?: { id: number; name: string; image?: string; href: string };
+  breadcrumb?: { id: number; title: string }[];
 };
 
 export const listings: Listing[] = [
@@ -36,6 +48,9 @@ export const listings: Listing[] = [
   { id: "77", slug: "xprinter-xp-350b-satisi-055-272-55-70-77", title: "Xprinter XP-350B satisi *055 272 55 70*", price: "130 ₼", location: "Bakı", age: "2 ay əvvəl", image: "https://storage.axtar.az/uploads/products/min/2026/07/18/6a5b5def20968-86d29141f6f62dd3d38bae151981e80d.jpg" },
   { id: "76", slug: "mifare-kartlar-055-272-55-70-76", title: "Mifare Kartlar 055 272 55 70", price: "1 ₼", location: "Bakı", age: "3 ay əvvəl", image: "https://storage.axtar.az/uploads/products/min/2026/06/27/6a3fb8802c716-0526393538e084823a1106ec5c0c386c.jpeg" },
 ];
+
+// Cabinet examples have one explicit listing type, matching the edit form.
+export const cabinetListings: Listing[] = listings.slice(0, 8).map((listing, index) => ({ ...listing, adType: index % 2 === 0 ? "lost" : "wanted" }));
 
 export const feedTabs = [
   { id: "premium", label: "Premium", icon: "crown" },

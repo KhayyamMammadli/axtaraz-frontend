@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, Eye, Heart, Share2 } from "lucide-react";
-import { formatPostDate, getPostAuthor, getPostBySlug, getPostImage } from "@/features/posts/api";
+import { getPostAuthor, getPostImage } from "@/features/posts/api";
+
+import { PostDetail } from "@/features/posts/post-detail";
+import { listings } from "@/features/listings/data";
+import { staticPosts } from "@/features/posts/static-posts";
 
 type Props = { params: Promise<{ slug: string }> };
 export const revalidate = 60;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = staticPosts.find(item => item.slug === slug);
   if (!post) return { title: "Blog tapılmadı" };
 
   const image = getPostImage(post);
@@ -29,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PostPage({ params }: Props) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = staticPosts.find(item => item.slug === slug);
   if (!post) notFound();
 
   const image = getPostImage(post);
@@ -46,45 +48,9 @@ export default async function PostPage({ params }: Props) {
     mainEntityOfPage: `https://axtar.az/post/${post.slug}`,
   };
 
-  return (
-    <div className="page-shell post-detail">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }}
-      />
-      <nav className="breadcrumbs">
-        <Link href="/">Ana səhifə</Link><span>›</span>
-        <Link href="/posts">Bloqlar</Link><span>›</span><b>{post.title}</b>
-      </nav>
-      <article>
-        <div className="post-hero">
-          {image && <img src={image} alt={post.title} />}
-          <div>
-            <button aria-label="Favoritə əlavə et"><Heart size={20} /></button>
-            <button aria-label="Paylaş"><Share2 size={20} /></button>
-          </div>
-        </div>
-        <header className="post-title-card">
-          <h1>{post.title}</h1>
-          <div>
-            <span>◷ &nbsp;{formatPostDate(post.created_at)}</span>
-            <span><Eye size={15} /> {post.view_count ?? 0} baxış</span>
-            {author && <b>{author}</b>}
-            <Link href="/posts">Bütün bloqlara bax</Link>
-          </div>
-        </header>
-        <section className="post-copy">
-          {post.short_description && <p>{post.short_description}</p>}
-          {post.description && <p>{post.description}</p>}
-        </section>
-        <div className="post-feedback">
-          Bu məqaləni faydalı hesab etdiniz? Rəyiniz bizim üçün önəmlidir. <button>♡ &nbsp;Bəyənirəm</button>
-        </div>
-        <section className="post-related">
-          <h2>Əlaqəli elanlar</h2>
-          <Link href="/full-search">Hamısına bax <ArrowRight size={15} /></Link>
-        </section>
-      </article>
-    </div>
-  );
+
+  return <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }}/>
+    <PostDetail post={post} related={listings.slice(0, 5)} similar={staticPosts.filter(item => item.id !== post.id).slice(0, 2)}/>
+  </>;
 }

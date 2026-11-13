@@ -2,16 +2,20 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { loginMock } from "./mock-session";
 import { Eye, EyeOff, LockKeyhole, Phone, RefreshCw } from "lucide-react";
 import styles from "./login.module.css";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [message, setMessage] = useState("");
+  const router = useRouter();
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setMessage("Daxil olma xidməti qoşulduqdan sonra hesabınıza daxil ola biləcəksiniz.");
+    const data = new FormData(event.currentTarget);
+    loginMock(data.get("remember") === "on");
+    router.replace("/account/listings");
   }
 
   return (
@@ -73,7 +77,7 @@ export function LoginForm() {
       </div>
 
       <button className={styles.submit} type="submit">Daxil olun</button>
-      <p className={styles.message} aria-live="polite">{message}</p>
+      <p className={styles.message}>Demo giriş: istənilən nömrə və şifrə ilə daxil ola bilərsiniz.</p>
 
       <div className={styles.register}>
         <span>Hələ də qeydiyyatdan keçməmisiniz?</span>

@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, type MouseEvent } from "react";
 import {
+  Pencil,
+  Trash2,
   ArrowRight,
   Check,
   CreditCard,
@@ -15,25 +17,7 @@ import {
 } from "lucide-react";
 import type { Ownership } from "@/features/ownerships/api";
 
-function getProfileHref(url?: string | null) {
-  if (!url) return "/ownerships";
-
-  try {
-    const parsed = new URL(url);
-    if (
-      (parsed.protocol === "https:" || parsed.protocol === "http:") &&
-      (parsed.hostname === "axtar.az" || parsed.hostname.endsWith(".axtar.az"))
-    ) {
-      return parsed.toString();
-    }
-  } catch {
-    // Fall back to the ownership directory when the API URL is invalid.
-  }
-
-  return "/ownerships";
-}
-
-function BusinessCard({ business }: { business: Ownership }) {
+export function BusinessCard({ business, onEdit, onDelete }: { business: Ownership; onEdit?: () => void; onDelete?: () => void }) {
   const coverImage =
     business.main_image_full ||
     business.main_image ||
@@ -44,16 +28,26 @@ function BusinessCard({ business }: { business: Ownership }) {
     business.images_full?.[0] ||
     business.main_image ||
     business.main_image_full;
-  const href = getProfileHref(business.url);
-  const external = href.startsWith("http");
+  const href = `/ownerships/${business.id}`;
+  const external = true;
+  function openBusiness(event: MouseEvent<HTMLAnchorElement>) {
+    if (!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
+      event.currentTarget.target = window.matchMedia("(max-width: 640px)").matches ? "_self" : "_blank";
+    }
+  }
 
   return (
     <article className="business-card">
+      {(onEdit || onDelete) && <div className="business-owner-actions">
+        {onEdit && <button type="button" onClick={onEdit} aria-label={`${business.title} — redaktə et`}><Pencil size={17}/></button>}
+        {onDelete && <button type="button" onClick={onDelete} aria-label={`${business.title} — sil`}><Trash2 size={17}/></button>}
+      </div>}
       <Link
         href={href}
         target={external ? "_blank" : undefined}
         rel={external ? "noopener noreferrer" : undefined}
         className="business-cover"
+        onClick={openBusiness}
         aria-label={`${business.title} biznes profilinə bax`}
       >
         {coverImage ? (
@@ -67,6 +61,7 @@ function BusinessCard({ business }: { business: Ownership }) {
         target={external ? "_blank" : undefined}
         rel={external ? "noopener noreferrer" : undefined}
         className="business-avatar"
+        onClick={openBusiness}
         aria-label={`${business.title} profilinə bax`}
       >
         {avatarImage ? <img src={avatarImage} alt="" /> : <span>{business.title.slice(0, 1)}</span>}
@@ -80,6 +75,7 @@ function BusinessCard({ business }: { business: Ownership }) {
           target={external ? "_blank" : undefined}
           rel={external ? "noopener noreferrer" : undefined}
           className="outline-button"
+          onClick={openBusiness}
         >
           İzlə
         </Link>
@@ -88,6 +84,7 @@ function BusinessCard({ business }: { business: Ownership }) {
         <h3>
           <Link
             href={href}
+            onClick={openBusiness}
             target={external ? "_blank" : undefined}
             rel={external ? "noopener noreferrer" : undefined}
           >
