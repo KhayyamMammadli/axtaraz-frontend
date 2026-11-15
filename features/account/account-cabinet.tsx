@@ -6,7 +6,9 @@ import Link from "next/link";
 import { Home, ChevronRight, UserRound, Pencil, Trash2, Megaphone, Store, Rss, Clock, CircleAlert, LoaderCircle, ScanLine, X, Plus, LayoutGrid, List, LogOut } from "lucide-react";
 import { ListingCard } from "@/features/listings/listing-card";
 import { cabinetListings, type Listing } from "@/features/listings/data";
-import { logoutMock, mockUser } from "@/features/auth/mock-session";
+import { logout, useSession } from "@/features/auth/session";
+import type { Customer } from "@/features/auth/types";
+import { formatPostDate } from "@/features/posts/api";
 import { AccountPosts } from "./account-posts";
 import { AccountBusinesses } from "./account-businesses";
 import { ProfileDialog, type ProfileDetails } from "./profile-dialog";
@@ -23,7 +25,9 @@ const statuses = [
   { label: "Vaxtı bitmiş", icon: CircleAlert }, { label: "Yoxlanışda", icon: LoaderCircle },
   { label: "Xətalı", icon: ScanLine }, { label: "Ləğv edilib", icon: X },
 ];
-export function AccountCabinet({ section }: { section: string }) {
+export function AccountCabinet({ section, initialCustomer }: { section: string; initialCustomer: Customer }) {
+  const session = useSession();
+  const customer = session.customer || initialCustomer;
   const [status, setStatus] = useState(0);
   const [items, setItems] = useState(cabinetListings);
   const [listView, setListView] = useState(false);
@@ -32,11 +36,11 @@ export function AccountCabinet({ section }: { section: string }) {
   const deleteCancel = useRef<HTMLButtonElement>(null);
   const editListing = (item: Listing) => router.push(`/product/create?type=${item.adType || "offer"}&edit=${encodeURIComponent(item.id)}`);
   const [deleting, setDeleting] = useState<Listing | null>(null);
-  const [name, setName] = useState(mockUser.name);
-  const [avatar, setAvatar] = useState<string>();
+  const [name, setName] = useState(initialCustomer.full_name);
+  const [avatar, setAvatar] = useState<string | undefined>(initialCustomer.logo || undefined);
   const [profileOpen, setProfileOpen] = useState(false);
   const [passwordOpen, setPasswordOpen] = useState(false);
-  const [profile, setProfile] = useState<ProfileDetails>({ firstName: "Xəyyam", lastName: "Məmmədli", phone: "(050) 000-00-00", email: mockUser.email });
+  const [profile, setProfile] = useState<ProfileDetails>({ firstName: initialCustomer.name, lastName: initialCustomer.last_name, phone: initialCustomer.mobile_number, email: initialCustomer.email });
   const [notice, setNotice] = useState("");
   useEffect(() => {
     if (!deleting) return;
@@ -46,17 +50,24 @@ export function AccountCabinet({ section }: { section: string }) {
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = overflow; };
   }, [deleting]);
+  useEffect(() => {
+    if (!session.loading && !session.customer && !session.error) router.replace("/login");
+  }, [session.loading, session.customer, session.error, router]);
+  useEffect(() => {
+    setName(customer.full_name); setAvatar(customer.logo || undefined);
+    setProfile({firstName:customer.name,lastName:customer.last_name,phone:customer.mobile_number,email:customer.email});
+  }, [customer]);
   const tab = tabs.find(item => item.id === section) ?? tabs[0];
   const profileContent = <>
         <div className={styles.avatarRow}><span className={styles.avatar}>{avatar ? <img src={avatar} alt="Profil şəkli"/> : <UserRound size={38}/>}</span><label className={styles.upload}>Şəkli dəyiş<input type="file" accept="image/*" onChange={event => { const file = event.target.files?.[0]; if (file) { const reader = new FileReader(); reader.onload = () => setAvatar(String(reader.result)); reader.readAsDataURL(file); } }}/></label></div>
-        <h2>{name}</h2><p className={styles.email}>{profile.email}</p><span className={styles.demo}>Demo hesab</span>
+        <h2>{name}</h2><p className={styles.email}>{profile.email}</p>
         <button className={styles.profileAction} onClick={() => setProfileOpen(true)}>Məlumatları yenilə <Pencil size={16}/></button>
         <button className={`${styles.profileAction} ${styles.passwordAction}`} onClick={() => setPasswordOpen(true)}>Şifrəni yenilə <Pencil size={16}/></button>
-        <div className={styles.profileDetails}><div><span>Telefon nömrəsi</span><strong>{profile.phone}</strong></div><div><span>E-poçt ünvanı</span><strong>{profile.email}</strong></div><div><span>Qeydiyyat tarixi</span><strong>29.11.2025</strong></div></div>
+        <div className={styles.profileDetails}><div><span>Telefon nömrəsi</span><strong>{profile.phone}</strong></div><div><span>E-poçt ünvanı</span><strong>{profile.email}</strong></div><div><span>Qeydiyyat tarixi</span><strong>{formatPostDate(customer.created_at) || "Qeyd edilməyib"}</strong></div></div>
   </>;
   return <div className={`page-shell-wide ${styles.page}`}>
     <nav className={`${styles.breadcrumb} ${styles.desktopOnly}`} aria-label="Səhifə yolu"><Link href="/" aria-label="Ana səhifə"><Home size={16}/></Link><ChevronRight size={14}/><span>Şəxsi kabinet</span><ChevronRight size={14}/><strong>{tab.label}</strong></nav>
-    <div className={`${styles.heading} ${styles.desktopOnly}`}><h1>Şəxsi kabinet</h1><button type="button" onClick={() => { logoutMock(); router.push("/login"); }}><LogOut size={18}/>Çıxış et</button></div>
+    <div className={`${styles.heading} ${styles.desktopOnly}`}><h1>Şəxsi kabinet</h1><button type="button" onClick={async () => { try { await logout(); router.replace("/login"); router.refresh(); } catch { setNotice("Çıxış mümkün olmadı. Yenidən cəhd edin."); } }}><LogOut size={18}/>Çıxış et</button></div>
     <div className={`${styles.layout} ${styles.tabLayout} ${section === "profile" ? styles.profileLayout : ""}`}>
       {section !== "profile" && <aside className={`${styles.profile} ${styles.desktopProfile}`} aria-label="Şəxsi məlumatlar">{profileContent}</aside>}
       <section className={`${styles.content} ${section !== "listings" ? styles.businessContent : ""}`} aria-label="Paylaşımlarım">

@@ -3,19 +3,28 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { loginMock } from "./mock-session";
-import { Eye, EyeOff, LockKeyhole, Phone, RefreshCw } from "lucide-react";
+import { login } from "./session";
+import { formatMobileNumber, mobileNumberPattern } from "./phone";
+import { Eye, EyeOff, LockKeyhole, Phone } from "lucide-react";
 import styles from "./login.module.css";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
+  const [phone, setPhone] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (pending) return;
     const data = new FormData(event.currentTarget);
-    loginMock(data.get("remember") === "on");
-    router.replace("/account/listings");
+    setPending(true); setError("");
+    try {
+      await login(formatMobileNumber(String(data.get("phone") || "")), String(data.get("password") || ""), data.get("remember") === "on");
+      router.replace("/account/listings"); router.refresh();
+    } catch (error) { setError(error instanceof Error ? error.message : "Giriş mümkün olmadı."); }
+    finally { setPending(false); }
   }
 
   return (
@@ -28,7 +37,24 @@ export function LoginForm() {
             type="tel"
             name="phone"
             autoComplete="tel"
-            placeholder="(055) 000-00-00"
+            placeholder="(050) 000-00-00"
+            inputMode="tel"
+            value={phone}
+            pattern={mobileNumberPattern.source}
+            title="Nömrəni (050) 000-00-00 formatında daxil edin"
+            onChange={event => {
+              const input = event.currentTarget;
+              const raw = input.value;
+              const cursor = input.selectionStart ?? raw.length;
+              const formatted = formatMobileNumber(raw);
+              setPhone(formatted);
+              if (cursor < raw.length) {
+                const count = raw.slice(0, cursor).replace(/\D/g, "").length;
+                let position = 0, seen = 0;
+                while (position < formatted.length && seen < count) { if (/\d/.test(formatted[position])) seen++; position++; }
+                requestAnimationFrame(() => input.setSelectionRange(position, position));
+              }
+            }}
             required
           />
         </span>
@@ -57,15 +83,6 @@ export function LoginForm() {
         </span>
       </label>
 
-      <label className={styles.captcha}>
-        <input type="checkbox" name="captcha" />
-        <span>Mən robot deyiləm</span>
-        <span className={styles.captchaBrand} aria-hidden="true">
-          <RefreshCw size={28} />
-          <small>reCAPTCHA</small>
-        </span>
-      </label>
-
       <div className={styles.options}>
         <label className={styles.remember}>
           <input type="checkbox" name="remember" />
@@ -76,8 +93,8 @@ export function LoginForm() {
         </Link>
       </div>
 
-      <button className={styles.submit} type="submit">Daxil olun</button>
-      <p className={styles.message}>Demo giriş: istənilən nömrə və şifrə ilə daxil ola bilərsiniz.</p>
+      <button className={styles.submit} type="submit" disabled={pending} aria-busy={pending}>{pending ? "Giriş edilir..." : "Daxil olun"}</button>
+      {error && <p className={styles.message} role="alert">{error}</p>}
 
       <div className={styles.register}>
         <span>Hələ də qeydiyyatdan keçməmisiniz?</span>

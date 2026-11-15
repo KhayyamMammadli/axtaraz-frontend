@@ -7,7 +7,7 @@ import { AccountMenu } from "./account-menu";
 import { CreateMenu } from "./create-menu";
 import { RegionPicker } from "./region-picker";
 import { useProductFavorites } from "@/features/favorites/product-favorites";
-import { useMockSession } from "@/features/auth/mock-session";
+import { useSession } from "@/features/auth/session";
 import styles from "./search-discovery.module.css";
 const catalogCategories = [
   { name: "Geyimlər (Kişi, Qadın, Uşaq)", icon: "🤹", items: ["Ümumi 23", "Ümumi", "Ümumi 3", "Ümumi 44", ...Array(24).fill("Ümumi 23"), "Ümumi 23", "Ümumi", "Ümumi 11", "Ümumi 32"] },
@@ -135,7 +135,7 @@ function InfoMenu({ close }: { close: () => void }) {
 }
 export function SiteHeader(){
   const pathname=usePathname();
-  const loggedIn = useMockSession();
+  const loggedIn = !!useSession().customer;
   const favoriteCount = useProductFavorites().ids.length;
   const[query,setQuery]=useState(""),[region,setRegion]=useState<string[]>([]),[catalogOpen,setCatalogOpen]=useState(false),[mobileMenu,setMobileMenu]=useState(false),[compact,setCompact]=useState(false);
   const [metros,setMetros]=useState<string[]>([]);

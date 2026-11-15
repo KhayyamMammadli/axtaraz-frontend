@@ -4,14 +4,15 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { CustomSelect } from "@/components/custom-select";
 import type { Listing } from "./data";
-import { mockUser, useMockSession } from "@/features/auth/mock-session";
+import { useSession } from "@/features/auth/session";
 import { ArrowLeft, ArrowRight, UploadCloud, ImageIcon, Info, Trash2, Plus, Eye, EyeOff, MapPin, ShieldCheck, Phone, CircleCheck, MoreHorizontal, ChevronRight, Gift } from "lucide-react";
 import styles from "./create-listing.module.css";
 const categories = ["Nəqliyyat", "Elektronika", "Daşınmaz əmlak", "Xidmətlər", "Telefonlar", "Şəxsi əşyalar", "Kompüterlər", "Ev və bağ üçün", "Məişət texnikası", "Təmir və tikinti"];
 const days = ["Bazar ertəsi", "Çərşənbə axşamı", "Çərşənbə", "Cümə axşamı", "Cümə", "Şənbə", "Bazar"];
 type Photo = { id: string; url: string; name: string };
 export function CreateListing({ variant = "offer", initialListing }: { variant?: "offer" | "wanted" | "lost"; initialListing?: Listing }) {
-  const loggedIn = useMockSession();
+  const { customer } = useSession();
+  const loggedIn = !!customer;
   const [mobileViewport, setMobileViewport] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const previewRef = useRef<HTMLElement>(null);
@@ -52,13 +53,13 @@ export function CreateListing({ variant = "offer", initialListing }: { variant?:
   const [rewardEnabled, setRewardEnabled] = useState(false);
   const isWanted = variant === "wanted";
   const priceLabel = isWanted ? "Təxmini büdcə" : "Qiymət";
-  const [data, setData] = useState({ category: initialListing?.category || "", title: initialListing?.title || "", price: initialListing?.price.replace(/[^\d.,]/g, "").replace(",", ".") || "", city: initialListing?.location || "", description: initialListing?.description || "", address: initialListing?.address || "", first: initialListing ? mockUser.name.split(" ")[0] : "", last: initialListing ? mockUser.name.split(" ").slice(1).join(" ") : "", email: initialListing ? mockUser.email : "", phone: initialListing?.phone || "", password: "", confirm: "", store: "", lostAt: "", approximateAt: "", reward: "" });
+  const [data, setData] = useState({ category: initialListing?.category || "", title: initialListing?.title || "", price: initialListing?.price.replace(/[^\d.,]/g, "").replace(",", ".") || "", city: initialListing?.location || "", description: initialListing?.description || "", address: initialListing?.address || "", first: "", last: "", email: "", phone: initialListing?.phone || "", password: "", confirm: "", store: "", lostAt: "", approximateAt: "", reward: "" });
   const [photos, setPhotos] = useState<Photo[]>(() => initialListing?.image ? [{ id: `existing-${initialListing.id}`, url: initialListing.image, name: initialListing.title }] : []);
   const [cover, setCover] = useState(initialListing?.image ? `existing-${initialListing.id}` : "");
   useEffect(() => {
-    if (!loggedIn) return;
-    setData(current => ({ ...current, first: current.first || mockUser.name.split(" ")[0], last: current.last || mockUser.name.split(" ").slice(1).join(" "), email: current.email || mockUser.email }));
-  }, [loggedIn]);
+    if (!customer) return;
+    setData(current => ({ ...current, first: current.first || customer.name, last: current.last || customer.last_name, email: current.email || customer.email, phone: current.phone || customer.mobile_number.replace(/^\+?994/, "0") }));
+  }, [customer]);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [sameHours, setSameHours] = useState(false);
