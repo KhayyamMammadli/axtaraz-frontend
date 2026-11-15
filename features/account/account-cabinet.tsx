@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Home, ChevronRight, UserRound, Pencil, Trash2, Megaphone, Store, Rss, Clock, CircleAlert, LoaderCircle, ScanLine, X, Plus, LayoutGrid, List, LogOut } from "lucide-react";
+import { Home, ChevronRight, UserRound, Pencil, Trash2, Megaphone, Store, Rss, Clock, CircleAlert, LoaderCircle, ScanLine, X, Plus, LayoutGrid, List } from "lucide-react";
 import { ListingCard } from "@/features/listings/listing-card";
 import { cabinetListings, type Listing } from "@/features/listings/data";
-import { logout, useSession } from "@/features/auth/session";
+import { useSession } from "@/features/auth/session";
 import type { Customer } from "@/features/auth/types";
 import { formatPostDate } from "@/features/posts/api";
 import { AccountPosts } from "./account-posts";
@@ -67,7 +67,6 @@ export function AccountCabinet({ section, initialCustomer }: { section: string; 
   </>;
   return <div className={`page-shell-wide ${styles.page}`}>
     <nav className={`${styles.breadcrumb} ${styles.desktopOnly}`} aria-label="Səhifə yolu"><Link href="/" aria-label="Ana səhifə"><Home size={16}/></Link><ChevronRight size={14}/><span>Şəxsi kabinet</span><ChevronRight size={14}/><strong>{tab.label}</strong></nav>
-    <div className={`${styles.heading} ${styles.desktopOnly}`}><h1>Şəxsi kabinet</h1><button type="button" onClick={async () => { try { await logout(); router.replace("/login"); router.refresh(); } catch { setNotice("Çıxış mümkün olmadı. Yenidən cəhd edin."); } }}><LogOut size={18}/>Çıxış et</button></div>
     <div className={`${styles.layout} ${styles.tabLayout} ${section === "profile" ? styles.profileLayout : ""}`}>
       {section !== "profile" && <aside className={`${styles.profile} ${styles.desktopProfile}`} aria-label="Şəxsi məlumatlar">{profileContent}</aside>}
       <section className={`${styles.content} ${section !== "listings" ? styles.businessContent : ""}`} aria-label="Paylaşımlarım">
