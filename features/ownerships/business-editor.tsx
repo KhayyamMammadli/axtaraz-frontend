@@ -2,15 +2,38 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { CustomSelect } from "@/components/custom-select";
 import { EditorPreview } from "@/components/editor-preview";
 import { ArrowLeft, ArrowRight, Check, ChartNoAxesColumnIncreasing, Headphones, LockKeyhole, ImageIcon, UploadCloud, Trash2, Plus, MapPin, Phone, Eye, Star, ShoppingBag, Gem, Users, Send } from "lucide-react";
 import { businessPlans } from "./business-plans";
+import { useBusinessOptions } from "./use-business-options";
+import { uploadImage } from "@/features/uploads/upload-image";
 import styles from "./business-editor.module.css";
 const days = ["Bazar ertəsi", "Çərşənbə axşamı", "Çərşənbə", "Cümə axşamı", "Cümə", "Şənbə", "Bazar"];
-const categories = ["Nəqliyyat", "Elektronika", "Daşınmaz əmlak", "Xidmətlər", "Telefonlar", "Şəxsi əşyalar", "Kompüterlər", "Ev və bağ üçün", "Məişət texnikası", "Təmir və tikinti"];
-type Picture = { id: string; url: string; name: string };
+type Picture = { id: string; url: string; name: string; file?: File; uploadedName?: string };
 export function BusinessEditor({ initialPlan, initialPeriod }: { initialPlan: string; initialPeriod: number }) {
+  const router = useRouter();
+  const categories = useBusinessOptions("categories");
+  const cities = useBusinessOptions("cities");
+  const [traceId, setTraceId] = useState("");
+  const [traceError, setTraceError] = useState("");
+  const [traceAttempt, setTraceAttempt] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const submitLock = useRef(false);
+  const traceRequest = useRef<Promise<string> | null>(null);
+  useEffect(() => {
+    let active = true;
+    setTraceError("");
+    const pending = traceRequest.current ??= fetch("/api/uploads/traces", { method: "POST", cache: "no-store" }).then(async response => {
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.message || "Yükləmə sessiyası yaradılmadı.");
+      if (typeof payload.data?.trace_id !== "string" || !payload.data.trace_id) throw new Error("Yükləmə sessiyası yaradılmadı.");
+      return payload.data.trace_id as string;
+    });
+    void pending.then(value => { if (active) setTraceId(value); }).catch(error => { if (active) { traceRequest.current = null; setTraceError(error instanceof Error ? error.message : "Yükləmə sessiyası yaradılmadı."); } });
+    return () => { active = false; };
+  }, [traceAttempt]);
   const [planId, setPlanId] = useState(initialPlan);
   const [viewedPlanId, setViewedPlanId] = useState(initialPlan);
   const [period, setPeriod] = useState(initialPeriod);
@@ -35,13 +58,48 @@ export function BusinessEditor({ initialPlan, initialPeriod }: { initialPlan: st
     for(const file of Array.from(files)) {
       if(!["image/jpeg","image/png"].includes(file.type) || file.size > 5*1024*1024) { error = "Yalnız 5 MB-dək JPG və PNG şəkillər qəbul edilir.";continue; }
       if(added.length >= limit) {error = `Maksimum ${kind === "gallery" ? galleryLimit : 1} şəkil seçə bilərsiniz.`;break;}
-      const url=URL.createObjectURL(file);urls.current.add(url);added.push({id:crypto.randomUUID(),url,name:file.name});
+      const url=URL.createObjectURL(file);urls.current.add(url);added.push({id:crypto.randomUUID(),url,name:file.name,file});
     }
     if(added.length) { if(kind !== "gallery") pictures[kind].forEach(picture => {URL.revokeObjectURL(picture.url);urls.current.delete(picture.url);});setPictures(current => ({...current,[kind]:kind === "gallery" ? [...current.gallery,...added] : added})); }
     setMessage(error);
   }
   function remove(kind:keyof typeof pictures,picture:Picture) {URL.revokeObjectURL(picture.url);urls.current.delete(picture.url);setPictures(current => ({...current,[kind]:current[kind].filter(item=>item.id!==picture.id)}));}
-  function submit(event:FormEvent) { event.preventDefault(); if(!pictures.logo.length || !pictures.cover.length) {setMessage("Mağaza loqosu və örtük şəklini əlavə edin.");return;} setMessage("Məlumatlar hazırdır. Yoxlamaya göndərmək üçün server bağlantısı hələ qoşulmayıb."); }
+  async function submit(event:FormEvent) {
+    event.preventDefault();
+    if (submitLock.current) return;
+    if (!traceId) { setMessage("Yükləmə sessiyasının hazırlanmasını gözləyin və ya yenidən cəhd edin."); return; }
+    if (!pictures.logo.length || !pictures.cover.length) { setMessage("Mağaza loqosu və örtük şəklini əlavə edin."); return; }
+
+    const categoryId = Number(data.category);
+    if (!categories.options.some(option => option.value === data.category)) { setMessage("Kateqoriya seçin."); return; }
+    let mobile = data.phone.replace(/\D/g, "");
+    if (mobile.startsWith("0")) mobile = mobile.slice(1);
+    if (!mobile.startsWith("994")) mobile = `994${mobile}`;
+    submitLock.current = true; setSubmitting(true); setMessage("");
+    try {
+      let mainImage = pictures.logo[0].uploadedName;
+      const entries = (["logo", "cover", "gallery"] as const).flatMap(kind => pictures[kind].map(picture => ({kind,picture})));
+      for (const [index, {kind,picture}] of entries.entries()) {
+        let name = picture.uploadedName;
+        if (!name) {
+          if (!picture.file) throw new Error("Şəkli yenidən seçin.");
+          setMessage(`Şəkillər yüklənir: ${index+1}/${entries.length}`);
+          name = await uploadImage(traceId, picture.file);
+          setPictures(current => ({...current, [kind]: current[kind].map(item => item.id === picture.id ? {...item, uploadedName: name} : item)}));
+        }
+        if (kind === "logo") mainImage = name;
+      }
+      setMessage("Biznes göndərilir…");
+      const response = await fetch("/api/my/ownerships", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: data.name.trim(), mobile_number: mobile, subdomain: data.subdomain || null, active_menu_links: ["products", "blog", "gallery", "about"], slogan: data.slogan, category_id: categoryId, ...(data.city ? { city_id: Number(data.city) } : {}), description: data.about, work_days: sameHours ? [1,2,3,4,5,6,7] : hours.map(row => days.indexOf(row.day)+1), template: "default", social_instagram: null, trace_id: traceId, main_image: mainImage }) });
+      const payload = await response.json();
+      if (!response.ok) {
+        const errors = payload.errors && typeof payload.errors === "object" ? Object.values(payload.errors).flat().filter(item => typeof item === "string").join(" ") : "";
+        throw new Error(errors || payload.message || "Biznes yaradılmadı.");
+      }
+      router.replace("/account/businesses"); router.refresh();
+    } catch (error) { setMessage(error instanceof Error ? error.message : "Biznes yaradılmadı."); }
+    finally { submitLock.current = false; setSubmitting(false); }
+  }
   function uploadBox(kind:keyof typeof pictures, title:string) { return <label className={styles.upload} onDragOver={event=>event.preventDefault()} onDrop={event=>{event.preventDefault();upload(kind,event.dataTransfer.files);}}><UploadCloud size={25}/><strong>{title}</strong><small>{kind === "logo" ? "PNG, JPG (500×500px)" : kind === "gallery" ? `Maksimum ${galleryLimit} şəkil yükləyə bilərsiniz` : "və ya sürükləyib buraxın"}</small>{kind === "logo" && <small>və ya sürükləyib buraxın</small>}<input type="file" aria-label={title} accept="image/jpeg,image/png" multiple={kind === "gallery"} onChange={event=>{upload(kind,event.target.files);event.target.value="";}}/></label>; }
   const logo=pictures.logo[0]?.url,cover=pictures.cover[0]?.url;
   return <div className={styles.page} data-business-editor><div className="page-shell"><div className={styles.heading}><Link href="/ownerships/create" aria-label="Paketlərə qayıt"><ArrowLeft size={23}/></Link><h1>Yeni biznes yarat</h1></div>
@@ -51,9 +109,9 @@ export function BusinessEditor({ initialPlan, initialPeriod }: { initialPlan: st
         <div className={styles.periods}>{[30,60,90,180].map(value=><button type="button" key={value} aria-pressed={period===value} className={period===value?styles.active:""} onClick={()=>setPeriod(value)}>{value} gün{value===period&&<span>seçili</span>}</button>)}</div>
         <div className={styles.secure}><LockKeyhole size={13}/>Ödəniş təhlükəsizdir və məlumatlarınız qorunur.</div><a href="https://axtar.az/contact" className={styles.help}><Headphones size={27}/><div><strong>Yardıma ehtiyacınız var?</strong><p>Bizə yazın, sizə kömək edək.</p></div></a>
       </aside>
-      <form id="business-editor-form" className={`${styles.panel} ${styles.form}`} onSubmit={submit}><h2>2. Biznes məlumatlarınızı daxil edin</h2><h3>Ümumi məlumatlar</h3>
-        <div className={styles.selectField}><label htmlFor="business-category">Kateqoriya <em>*</em></label><CustomSelect id="business-category" label="Kateqoriya" required value={data.category} onChange={value=>setData(current=>({...current,category:value}))} options={categories.map(value=>({value,label:value}))}/></div>
-        <div className={styles.selectField}><label htmlFor="business-city">Şəhər</label><CustomSelect id="business-city" label="Şəhər" value={data.city} onChange={value=>setData(current=>({...current,city:value}))} options={["Bakı","Sumqayıt","Gəncə","Şəki","Lənkəran","Quba"].map(value=>({value,label:value}))}/></div>
+      <form id="business-editor-form" className={`${styles.panel} ${styles.form}`} onSubmit={submit} inert={submitting}><h2>2. Biznes məlumatlarınızı daxil edin</h2><h3>Ümumi məlumatlar</h3>
+        <div className={styles.selectField}><label htmlFor="business-category">Kateqoriya <em>*</em></label><CustomSelect id="business-category" label="Kateqoriya" required value={data.category} onChange={value=>setData(current=>({...current,category:value}))} disabled={categories.loading || !!categories.error} placeholder={categories.loading ? "Yüklənir…" : "Seçin"} options={categories.options}/>{categories.error&&<p role="alert">{categories.error} <button type="button" onClick={categories.retry}>Yenidən cəhd et</button></p>}</div>
+        <div className={styles.selectField}><label htmlFor="business-city">Şəhər</label><CustomSelect id="business-city" label="Şəhər" value={data.city} onChange={value=>setData(current=>({...current,city:value}))} disabled={cities.loading || !!cities.error} placeholder={cities.loading ? "Yüklənir…" : "Seçin"} options={cities.options}/>{cities.error&&<p role="alert">{cities.error} <button type="button" onClick={cities.retry}>Yenidən cəhd et</button></p>}</div>
         <label>Biznes adı <em>*</em><input required maxLength={100} placeholder="Məs: Modern Home" {...field("name")}/></label>
         <label>Sloqan <small>(istəyə bağlı)</small><span className={styles.count}>{data.slogan.length}/80</span><input maxLength={80} placeholder="Məs: Eviniz üçün ən yaxşı seçimlər" {...field("slogan")}/></label>
         <label>Haqqımızda <em>*</em><div className={styles.textarea}><textarea required maxLength={1000} placeholder="Biznesiniz haqqında məlumat yazın..." {...field("about")}/><span>{data.about.length}/1000</span></div></label>
@@ -68,10 +126,10 @@ export function BusinessEditor({ initialPlan, initialPeriod }: { initialPlan: st
         <button type="button" className={styles.add} onClick={()=>setPhones(current=>[...current,{id:crypto.randomUUID(),value:""}])}><Plus size={16}/>Əlavə telefon əlavə et</button>
         <label>Subdomain <small>(5–30 simvol, hərf və rəqəmlər)</small><div className={styles.subdomain}><input disabled={planId!=="premium"} minLength={5} maxLength={30} pattern="[a-zA-Z0-9]{5,30}" placeholder="biznesiniz" {...field("subdomain")}/><span>.axtar.az</span></div></label>
         {planId!=="premium"&&<div className={styles.upgrade}>Yalnız Premium paketində mövcuddur. Premium paket seçdikdən sonra subdomaininizi daxil edə bilərsiniz.<button type="button" onClick={()=>selectPlan("premium")}>Premium paketə keç <ArrowRight size={14}/></button></div>}
-        <label>Ünvan <em>*</em><div className={styles.address}><input required placeholder="Məs: Bakı, Nəsimi r., Azadlıq pr. 152" {...field("address")}/><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.address||data.city||"Bakı")}`} target="_blank" rel="noreferrer"><MapPin size={14}/>Xəritədə göstər</a></div></label>
-        {message&&<p className={styles.message} role="status">{message}</p>}<button type="submit" className={styles.submit}><Send size={17}/>Yoxlamaya göndər</button><p className={styles.reviewNote}><LockKeyhole size={12}/>Məlumatlarınız admin tərəfindən yoxlanılacaq və təsdiq edildikdən sonra aktiv olacaq</p>
+        <label>Ünvan <em>*</em><div className={styles.address}><input required placeholder="Məs: Bakı, Nəsimi r., Azadlıq pr. 152" {...field("address")}/><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.address||cities.options.find(option=>option.value===data.city)?.label||"Bakı")}`} target="_blank" rel="noreferrer"><MapPin size={14}/>Xəritədə göstər</a></div></label>
+        {!traceId&&<p className={styles.message} role="status">{traceError || "Yükləmə sessiyası hazırlanır…"}{traceError&&<button type="button" onClick={()=>setTraceAttempt(value=>value+1)}>Yenidən cəhd et</button>}</p>}{message&&<p className={styles.message} role="status">{message}</p>}<button type="submit" className={styles.submit} disabled={!traceId || submitting}><Send size={17}/>{submitting ? "Göndərilir…" : "Yoxlamaya göndər"}</button><p className={styles.reviewNote}><LockKeyhole size={12}/>Məlumatlarınız admin tərəfindən yoxlanılacaq və təsdiq edildikdən sonra aktiv olacaq</p>
       </form>
-      <EditorPreview className={`${styles.panel} ${styles.preview}`} formId="business-editor-form" title="Biznesiniz belə görünəcək" submitLabel="Yoxlamaya göndər"><h2>3. Biznes səhifəniz belə görünəcək</h2><div className={styles.previewCard}><div className={styles.cover}>{cover&&<img src={cover} alt="Biznesin örtük şəkli"/>}</div><div className={styles.identity}><div className={styles.avatar}>{logo?<img src={logo} alt="Biznes loqosu"/>:<ImageIcon size={24}/>}</div><div className={styles.businessName}><h3>{data.name||"Biznesin adı"}</h3>{planId!=="start"&&<span className={styles.premium}>{planId==="premium"?"Premium":"Biznes"}</span>}<p>{data.slogan||data.category||"Kateqoriya seçilməyib"}</p><strong className={styles.rating}><Star size={17}/>Hələ rəy yoxdur</strong></div><div className={styles.actions}><span><Eye size={14}/>İzlə</span><span><Phone size={13}/>+994 {data.phone||"55 123 45 67"}</span><span>Mesaj yaz</span></div></div>
+      <EditorPreview className={`${styles.panel} ${styles.preview}`} formId="business-editor-form" title="Biznesiniz belə görünəcək" submitLabel="Yoxlamaya göndər"><h2>3. Biznes səhifəniz belə görünəcək</h2><div className={styles.previewCard}><div className={styles.cover}>{cover&&<img src={cover} alt="Biznesin örtük şəkli"/>}</div><div className={styles.identity}><div className={styles.avatar}>{logo?<img src={logo} alt="Biznes loqosu"/>:<ImageIcon size={24}/>}</div><div className={styles.businessName}><h3>{data.name||"Biznesin adı"}</h3>{planId!=="start"&&<span className={styles.premium}>{planId==="premium"?"Premium":"Biznes"}</span>}<p>{data.slogan||categories.options.find(option=>option.value===data.category)?.label||"Kateqoriya seçilməyib"}</p><strong className={styles.rating}><Star size={17}/>Hələ rəy yoxdur</strong></div><div className={styles.actions}><span><Eye size={14}/>İzlə</span><span><Phone size={13}/>+994 {data.phone||"55 123 45 67"}</span><span>Mesaj yaz</span></div></div>
         <div className={styles.stats}>{[[ShoppingBag,"0","Elan"],[Gem,"0","Baxış"],[Users,"0","İzləyici"]].map(([Icon,value,label])=>{const StatIcon=Icon as typeof ShoppingBag;return <div key={String(label)}><StatIcon size={21}/><strong>{String(value)}<small>{String(label)}</small></strong></div>;})}</div>
         <div className={styles.location}><span><MapPin size={14}/>{data.address||"Ünvan seçilməyib"}</span><span>{hours.length?`${sameHours?"Hər gün":hours[0].day} ${hours[0].start} – ${hours[0].end}`:"İş saatları seçilməyib"}</span><strong>Açıqdır</strong></div>
         <div className={styles.tabs}>{["Haqqımızda","Təkliflər","Qalereya","Rəylər (0)"].map(value=><button type="button" key={value} className={tab===value?styles.currentTab:""} onClick={()=>setTab(value)}>{value}</button>)}</div>
